@@ -1,0 +1,30 @@
+
+body{
+    background-color: #343a40;
+    color: #fff;
+}
+
+.item-image{
+    width: 6rem;
+}
+
+.item-name{
+    width: 17%;
+}
+
+.table td {
+   text-align: center;
+}
+
+.table th {
+   text-align: center;
+}
+
+.results tr[visible='false'],
+.no-result{
+  display:none;
+}
+
+.results tr[visible='true']{
+  display:table-row;
+}

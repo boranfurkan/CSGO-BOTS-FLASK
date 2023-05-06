@@ -1,0 +1,153 @@
+{% extends "base.html" %} {% block title %}Configs{% endblock %} {% block
+content %}
+<form method="POST">
+  <h3 align="center">User Configs</h3>
+  <div class="form-group">
+    <label for="suggested_rate">Suggested Rate</label>
+    <input
+      required
+      type="number"
+      step="0.01"
+      class="form-control"
+      id="suggested_rate"
+      name="suggested_rate"
+      placeholder="Enter suggested rate"
+      value={% if user.configs %}
+            {{ user.configs[0].suggested_rate }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="shadow_user_token">Shadow User Token</label>
+    <input
+      required
+      type="text"
+      class="form-control"
+      id="shadow_user_token"
+      name="shadow_user_token"
+      placeholder="Enter shadowpay user token"
+      value={% if user.configs %}
+            {{ user.configs[0].shadow_user_token }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="shadow_merchant_token">Shadow Merchant Token</label>
+    <input
+      required
+      type="text"
+      class="form-control"
+      id="shadow_merchant_token"
+      name="shadow_merchant_token"
+      placeholder="Enter shadowpay merchant token"
+      value={% if user.configs %}
+            {{ user.configs[0].shadow_merchant_token }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="waxpeer_token">Waxpeer Token</label>
+    <input
+      required
+      type="text"
+      class="form-control"
+      id="waxpeer_token"
+      name="waxpeer_token"
+      placeholder="Enter waxpeer user Token"
+      value={% if user.configs %}
+            {{ user.configs[0].waxpeer_token }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="csgo_market_token">Csgo Market Token</label>
+    <input
+      required
+      type="text"
+      class="form-control"
+      id="csgo_market_token"
+      name="csgo_market_token"
+      placeholder="Enter csgo market user token"
+      value={% if user.configs %}
+            {{ user.configs[0].csgo_market_token }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="shadowpay_discount">Shadowpay Discount</label>
+    <input
+      required
+      type="number"
+      class="form-control"
+      id="shadowpay_discount"
+      name="shadowpay_discount"
+      placeholder="Enter shadowpay discount"
+      value={% if user.configs %}
+            {{ user.configs[0].shadowpay_discount }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="waxpeer_discount">Waxpeer Discount</label>
+    <input
+      required
+      type="number"
+      class="form-control"
+      id="waxpeer_discount"
+      name="waxpeer_discount"
+      placeholder="Enter waxpeer discount"
+      value={% if user.configs %}
+            {{ user.configs[0].waxpeer_discount }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="market_discount">Csgo Market discount</label>
+    <input
+      required
+      type="number"
+      class="form-control"
+      id="market_discount"
+      name="market_discount"
+      placeholder="Enter csgo market discount"
+      value={% if user.configs %}
+            {{ user.configs[0].market_discount }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <div class="form-group">
+    <label for="waxpeer_cookie">Waxpeer User Cookie</label>
+    <input
+      required
+      type="text"
+      class="form-control"
+      id="waxpeer_cookie"
+      name="waxpeer_cookie"
+      placeholder="Enter waxpeer user cookie"
+      value={% if user.configs %}
+            {{ user.configs[0].waxpeer_cookie }}
+            {% else %}
+            ""
+            {% endif %}
+    />
+  </div>
+  <br />
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

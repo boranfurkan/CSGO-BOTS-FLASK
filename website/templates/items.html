@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Items{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.css">
+<script src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.21.4/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
+
+<table
+  id="table"
+  data-toggle="table" data-filter-control="true" data-show-export="true" data-sort-name="buff" data-sort-order="desc"
+  class="table-dark table-hover">
+  <thead>
+    <tr>
+      <th data-field="id" scope="col" data-sortable="true">#</th>
+      <th scope="col">Image</th>
+      <th data-field="name" data-filter-control="input" data-sortable="true" scope="col">Item Name</th>
+      <th data-field="buff" scope="col" data-sortable="true">Buff Listing </th>
+      <th data-field="price" data-sortable="true" scope="col">Suggested Price</th>
+      <th scope="col">Shadow</th>
+      <th scope="col">Waxpeer</th>
+      <th scope="col">Market</th>
+      <th scope="col">Save</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in user_items %}
+        {% set image_url = "https://community.cloudflare.steamstatic.com/economy/image/" + item.image%}
+        <tr class="align-middle">
+          <th scope="row">{{ item.id }}</th>
+          <td><img class="item-image" src="{{ image_url }}"/></td>
+          <td class="align-middle justify-middle">{{ item.name }}</td>
+          <td class="align-middle">{{ item.buff_listing_7 }}</td>
+          <td class="align-middle">
+              <input value="{{ item.suggested_price }}"
+                   id="{{ item.id }}"
+                   type="number"
+                   name="suggested_price"
+                   placeholder="Enter suggested price"
+                   required/>
+          </td>
+          <td class="align-middle">{{ item.shadow_price }}</td>
+          <td class="align-middle">{{ item.waxpeer_price }}</td>
+          <td class="align-middle">{{ item.market_price }}</td>
+          <td class="align-middle"><button type="button" class="btn btn-primary" onclick="updateItem({{ item.id }})">Save</button></td>
+        </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+  $(function() {
+  $('#table').bootstrapTable();
+});
+</script>
+{% endblock %}
