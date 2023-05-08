@@ -11,6 +11,12 @@ $(document).ready(function() {
         shadow.innerHTML += message + "\n";
         shadow.scrollTop = shadow.scrollHeight;
     })
+
+    mySocket.on("waxpeer", function(message){
+        let waxpeer = $("#waxpeer")[0]
+        waxpeer.innerHTML += message + "\n";
+        waxpeer.scrollTop = shadow.scrollHeight;
+    })
 })
 
 function start(channel){

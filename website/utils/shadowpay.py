@@ -41,12 +41,34 @@ class Shadow:
             else:
                 print(f"Please add {item_name} into special items. There is no buff data found!")
 
+        total_items = int(request_shadow["metadata"]["total"])
+        if total_items > 100:
+            offset = 100
+            while total_items > offset:
+                request_shadow = requests.get(
+                    f"https://api.shadowpay.com/api/v2/user/offers?limit=100&offset={offset}",
+                    headers=self.__user_headers).json()
+
+                for item in request_shadow["data"]:
+                    item_id = item["id"]
+                    item_name = item["steam_item"]["steam_market_hash_name"]
+                    current_price = float((item["price"])).__round__(2)
+                    if item_name in user_items:
+                        suggested_price = user_items[item_name]
+                        self._inventory[item_name] = {}
+                        self._inventory[item_name]["id"] = item_id
+                        self._inventory[item_name]["suggested_price"] = suggested_price
+                        self._inventory[item_name]["price"] = current_price
+                        self.__history[item_id] = current_price
+                    else:
+                        print(f"Please add {item_name} into special items. There is no buff data found!")
+                offset += 100
         return self._inventory
 
     def create_links(self):
         url = "https://api.shadowpay.com/api/v2/merchant/items?limit=999"
-        for k in range(0, len(self._inventory), 65):
-            separated_array = list(self._inventory.keys())[k:k + 65]
+        for k in range(0, len(self._inventory), 70):
+            separated_array = list(self._inventory.keys())[k:k + 70]
             for key in separated_array:
                 url += "&steam_market_hash_name[]=" + key
             self.__links_array.append(url)
@@ -54,7 +76,6 @@ class Shadow:
         return self.__links_array
 
     def update_items(self):
-        self.set_logs([])
         for link in self.__links_array:
             response = requests.get(link, headers=self.__merchant_headers).json()
             for item in response["data"]:
@@ -116,9 +137,6 @@ class Shadow:
                                f"Total Not Updated: {response['metadata']['total_not_updated_items']}")
             for item in response["updated_items"]:
                 self.__logs.append(f"{item['steam_item']['steam_market_hash_name']} is updated to: {item['price']}")
-        self.set_items_to_update([])
-        self.set_links_array([])
-        self.set_market_data({})
         return self.get_logs()
 
     def set_items_to_update(self, new_array: list):
