@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from .api_utils import get_user_items
 from .models import Config, Item
 from .logger import logger
-from . import db
+from .database import db
 import asyncio
 import json
 import time
@@ -50,6 +50,13 @@ def configs():
                 db.session.commit()
                 flash('Successfully updated the configs!', category='success')
             else:
+                current_rate = Config.query.filter_by(user_id=current_user.id).first().suggested_rate
+                if current_rate != suggested_rate:
+                    all_user_items = Item.query.filter_by(user_id=current_user.id).all()
+                    for item in all_user_items:
+                        item.suggested_price = float(item.buff_listing_7 * suggested_rate).__round__(2)
+                    flash('Successfully updated the item prices according to new current_rate!', category='success')
+
                 Config.query.filter_by(
                     user_id=current_user.id).update(
                     dict(suggested_rate=suggested_rate, shadow_user_token=shadow_user_token,
@@ -99,7 +106,7 @@ def items():
                     buff_listing_7 = values["listing7"]
                     buff_listing30 = values["listing30"]
                     buff_listing60 = values["listing60"]
-                    if "image" in values.keys():
+                    if "image" in values.keys() and values["image"] is not None:
                         image = values["image"]
                     else:
                         image = "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQk" \

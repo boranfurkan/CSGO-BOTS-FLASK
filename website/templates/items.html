@@ -26,7 +26,7 @@
   </thead>
   <tbody>
     {% for item in user_items %}
-        {% set image_url = "https://community.cloudflare.steamstatic.com/economy/image/" + item.image%}
+        {% set image_url = "https://community.cloudflare.steamstatic.com/economy/image/" + item.image %}
         <tr class="align-middle">
           <th scope="row">{{ item.id }}</th>
           <td><img class="item-image" src="{{ image_url }}"/></td>

@@ -66,19 +66,5 @@
         <div class="root">{% block content %} {% endblock %}</div>
     </div>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-    <script>
-    $(document).ready(function() {
-        const socket = io({autoConnect: true});
-        socket.on("connect", function() {
-            socket.emit("user_join", "furkan joined");
-        })
-        socket.on('message', function(data) {
-          console.log(data);
-        });
-        socket.on("chat", function(data){
-            console.log(data)
-        })
-      });
-    </script>
   </body>
 </html>

@@ -1,4 +1,3 @@
-
 body{
     background-color: #343a40;
     color: #fff;
@@ -27,4 +26,25 @@ body{
 
 .results tr[visible='true']{
   display:table-row;
+}
+
+.log-area {
+    height: 13vh;
+    overflow-y: auto;
+    margin-bottom: 0;
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1%;
+}
+
+.log-header > h2 {
+    margin: 0;
+}
+
+.log-header > div > button {
+    margin-left: 15px;
 }

@@ -1,11 +1,8 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from .database import db, DB_NAME
 from flask_login import LoginManager
 from .sockets import socketio
 from os import path
-
-db = SQLAlchemy()
-DB_NAME = "database.db"
 
 
 def create_app():

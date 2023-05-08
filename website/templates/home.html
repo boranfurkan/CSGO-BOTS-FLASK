@@ -1,4 +1,53 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="log-header">
+      <h2>SHADOWPAY</h2>
+      <div>
+          <button class="btn btn-success " onclick="start('shadowpay')">Start</button>
+          <button class="btn btn-danger disabled" onclick="stop('shadowpay')">Stop</button>
+          <button class="btn btn-warning disabled" onclick="stop('shadowpay')">Restart</button>
+      </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <pre id="shadow" class="log-area"></pre>
+    </div>
+  </div>
 
+  <br/>
+  <br/>
+
+  <div class="log-header">
+      <h2>WAXPEER</h2>
+      <div>
+          <button class="btn btn-success" onclick="start('waxpeer')">Start</button>
+          <button class="btn btn-danger disabled" onclick="stop('waxpeer')">Stop</button>
+          <button class="btn btn-warning disabled" onclick="stop('waxpeer')">Restart</button>
+      </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <pre id="waxpeer" class="log-area"></pre>
+    </div>
+  </div>
+
+  <br/>
+  <br/>
+
+  <div class="log-header">
+      <h2>CSGO MARKET</h2>
+      <div>
+          <button class="btn btn-success" onclick="start('market')">Start</button>
+          <button class="btn btn-danger disabled" onclick="stop('market')">Stop</button>
+          <button class="btn btn-warning disabled" onclick="stop('market')">Restart</button>
+      </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <pre id="market" class="log-area"></pre>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
 {% endblock %}

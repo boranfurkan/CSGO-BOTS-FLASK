@@ -1,6 +1,4 @@
 import asyncio
-import time
-
 import requests
 import gspread
 from .logger import logger
