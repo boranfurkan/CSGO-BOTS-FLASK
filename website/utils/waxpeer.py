@@ -1,4 +1,5 @@
 import requests
+from http.cookies import SimpleCookie
 
 
 class Waxpeer:
@@ -13,7 +14,22 @@ class Waxpeer:
         self.__history = {}
         self.__items_to_update = {"items": []}
         self.__logs = []
-        self.__headers = {}
+        self.__headers = {
+            'authority': 'waxpeer.com',
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'origin': 'https://old.waxpeer.com',
+            'pragma': 'no-cache',
+            'referer': 'https://old.waxpeer.com/',
+            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-site',
+            'token': 'null',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+        }
 
     def get_inventory(self, user_items):
         response = requests.get(f"https://api.waxpeer.com/v1/list-items-steam?api={self.token}").json()
@@ -104,6 +120,14 @@ class Waxpeer:
                 self.__logs.append(f"{item['item_id']} is updated to: {item['price']}")
         return self.get_logs()
 
+    def make_user_online(self):
+        cookie = SimpleCookie()
+        cookie.load(self.cookie)
+        cookies = {k: v.value for k, v in cookie.items()}
+        response = requests.get('https://waxpeer.com/api/user/check-sell-status', cookies=cookies,
+                                headers=self.__headers).text
+        return response
+
     def set_items_to_update(self, new_array: list):
         self.__items_to_update["items"] = new_array
         return self.__items_to_update
@@ -118,9 +142,6 @@ class Waxpeer:
 
     def get_items_to_update(self):
         return self.__items_to_update["items"]
-
-    def get_links_array(self):
-        return self.__links_array
 
     def get_market_data(self):
         return self.__market_data

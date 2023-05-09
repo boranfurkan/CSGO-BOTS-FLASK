@@ -35,7 +35,7 @@ def handle_new_message(message):
         while not stop_thread:
             try:
                 shadowpay.create_links()
-                time.sleep(0.3)
+                time.sleep(0.1)
                 shadowpay.set_logs([])
                 logs = shadowpay.update_items()
                 shadowpay.set_items_to_update([])
@@ -97,7 +97,11 @@ def handle_new_message(message):
                 waxpeer.set_market_data({})
                 for log in logs:
                     socketio.emit("waxpeer", log)
-                time.sleep(5)
+
+                is_online = waxpeer.make_user_online()
+                socketio.emit("waxpeer", is_online)
+
+                time.sleep(20)
             except BaseException as error:
                 socketio.emit("waxpeer", error)
 
