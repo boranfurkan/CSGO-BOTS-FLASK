@@ -48,3 +48,23 @@ body{
 .log-header > div > button {
     margin-left: 15px;
 }
+
+.special-item {
+    background: linear-gradient(to right, #CC9934, #1E1D1B);
+	background-size: 200% 200%;
+	animation: gradient 10s ease infinite;
+}
+.sale-price{
+    max-width: 100px;
+}
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}

@@ -141,11 +141,7 @@ content %}
       id="waxpeer_cookie"
       name="waxpeer_cookie"
       placeholder="Enter waxpeer user cookie"
-      value={% if user.configs %}
-            {{ user.configs[0].waxpeer_cookie }}
-            {% else %}
-            ""
-            {% endif %}
+      value='{% if user.configs %}{{ user.configs[0].waxpeer_cookie }}{% endif %}'
     />
   </div>
   <br />

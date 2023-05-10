@@ -19,7 +19,6 @@ is_csgo_market_working = False
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
-    emit("message", "sa")
 
 
 @socketio.on('disconnect')
@@ -28,7 +27,7 @@ def handle_disconnect():
 
 
 @socketio.on("shadowpay")
-def handle_new_message(message):
+def handle_shadowpay(message):
     global is_shadowpay_working
     all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
     shadowpay = Shadow(user_token=all_user_configs.shadow_user_token,
@@ -48,6 +47,7 @@ def handle_new_message(message):
                 for log in logs:
                     socketio.emit("shadowpay", log)
             except BaseException as error:
+                print(error)
                 socketio.emit("shadowpay", error)
 
     shadowpay_thread = Thread(target=shadow_run)
@@ -73,7 +73,7 @@ def handle_new_message(message):
 
 
 @socketio.on("waxpeer")
-def handle_new_message(message):
+def handle_waxpeer(message):
     global is_waxpeer_working
     all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
     waxpeer = Waxpeer(token=all_user_configs.waxpeer_token, cookie=all_user_configs.waxpeer_cookie,
@@ -95,6 +95,7 @@ def handle_new_message(message):
 
                 time.sleep(10)
             except BaseException as error:
+                print(error)
                 socketio.emit("waxpeer", error)
 
     waxpeer_thread = Thread(target=waxpeer_run)
@@ -119,7 +120,7 @@ def handle_new_message(message):
 
 
 @socketio.on("csgo_market")
-def handle_new_message(message):
+def handle_csgo_market(message):
     global is_csgo_market_working
     all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
     csgo_market = CsgoMarket(secret_key=all_user_configs.csgo_market_token, discount=all_user_configs.market_discount)
@@ -130,6 +131,7 @@ def handle_new_message(message):
                 csgo_market.create_links()
                 csgo_market.request_market_data()
                 csgo_market.set_logs([])
+                time.sleep(1)
                 logs = csgo_market.update_items()
                 csgo_market.set_items_to_update({})
                 csgo_market.set_links_array([])
@@ -137,10 +139,11 @@ def handle_new_message(message):
                 for log in logs:
                     socketio.emit("csgo_market", log)
 
+                time.sleep(1)
                 is_online = csgo_market.make_user_online()
                 socketio.emit("csgo_market", is_online)
-                time.sleep(3)
             except BaseException as error:
+                print(error)
                 socketio.emit("csgo_market", error)
 
     csgo_market_thread = Thread(target=csgo_market_run)

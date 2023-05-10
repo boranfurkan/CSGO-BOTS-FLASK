@@ -9,15 +9,16 @@
 
 <table
   id="table"
-  data-toggle="table" data-filter-control="true" data-show-export="true" data-sort-name="buff" data-sort-order="desc"
+  data-toggle="table" data-filter-control="true" data-show-export="true" data-sort-name="buff_7" data-sort-order="desc"
   class="table-dark table-hover">
   <thead>
     <tr>
       <th data-field="id" scope="col" data-sortable="true">#</th>
       <th scope="col">Image</th>
       <th data-field="name" data-filter-control="input" data-sortable="true" scope="col">Item Name</th>
-      <th data-field="buff" scope="col" data-sortable="true">Buff Average 7</th>
-      <th data-field="price" data-sortable="true" scope="col">Suggested Price</th>
+      <th data-field="buff" scope="col" data-sortable="true">Buff Listing</th>
+      <th data-field="buff_7" scope="col" data-sortable="true">Buff Listing 7</th>
+      <th data-field="price" data-sortable="true" scope="col">Sale Price</th>
       <th scope="col">Shadow</th>
       <th scope="col">Waxpeer</th>
       <th scope="col">Market</th>
@@ -27,10 +28,11 @@
   <tbody>
     {% for item in user_items %}
         {% set image_url = "https://community.cloudflare.steamstatic.com/economy/image/" + item.image %}
-        <tr class="align-middle">
+        <tr class="align-middle {% if item.is_special_priced %}special-item{% endif %}">
           <th scope="row">{{ item.id }}</th>
           <td><img class="item-image" src="{{ image_url }}"/></td>
           <td class="align-middle justify-middle">{{ item.name }}</td>
+          <td class="align-middle">{{ item.buff_listing }}</td>
           <td class="align-middle">{{ item.buff_listing_7 }}</td>
           <td class="align-middle">
               <input value="{{ item.suggested_price }}"
@@ -38,6 +40,7 @@
                    type="number"
                    name="suggested_price"
                    placeholder="Enter suggested price"
+                   class="sale-price"
                    required/>
           </td>
           <td class="align-middle">{{ item.shadow_price }}</td>

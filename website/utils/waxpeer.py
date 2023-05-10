@@ -115,9 +115,8 @@ class Waxpeer:
             response = requests.post(f"https://api.waxpeer.com/v1/edit-items?api={self.token}", json=data).json()
             self.__logs.append(f"Total Updated: {len(response['updated'])} "
                                f"Total Not Updated: {len(response['failed'])}")
-
             for item in response["updated"]:
-                self.__logs.append(f"{item['item_id']} is updated to: {item['price']}")
+                self.__logs.append(f"{self.__history[int(item['item_id'])]['name']} is updated to: {item['price']}")
         return self.get_logs()
 
     def make_user_online(self):

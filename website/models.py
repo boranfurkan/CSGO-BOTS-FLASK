@@ -22,7 +22,7 @@ class Config(db.Model):
     shadowpay_discount = db.Column(db.Integer)
     waxpeer_discount = db.Column(db.Integer)
     market_discount = db.Column(db.Integer)
-    waxpeer_cookie = db.Column(db.String(1500))
+    waxpeer_cookie = db.Column(db.String(5000))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 

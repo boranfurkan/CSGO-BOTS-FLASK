@@ -22,7 +22,8 @@ def home():
             new_bot_status = BotStatus(user_id=current_user.id)
             db.session.add(new_bot_status)
             db.session.commit()
-            return render_template("home.html", user=current_user)
+            user_bot_status = BotStatus.query.filter_by(user_id=current_user.id).first()
+            return render_template("home.html", user=current_user, user_bot_status=user_bot_status)
 
         else:
             user_bot_status = BotStatus.query.filter_by(user_id=current_user.id).first()
@@ -87,17 +88,7 @@ def configs():
 @login_required
 def items():
     if request.method == 'GET':
-        if not current_user.configs[0].shadow_user_token:
-            flash('You should provide your shadowpay user token', category='error')
-            time.sleep(1)
-            return redirect(url_for('views.configs'))
-        elif not current_user.configs[0].waxpeer_token:
-            flash('You should provide your waxpeer user token', category='error')
-            time.sleep(1)
-            return redirect(url_for('views.configs'))
-        elif not current_user.configs[0].csgo_market_token:
-            flash('You should provide your csgo market token', category='error')
-            time.sleep(1)
+        if not current_user.configs:
             return redirect(url_for('views.configs'))
         else:
             shadow_token = current_user.configs[0].shadow_user_token

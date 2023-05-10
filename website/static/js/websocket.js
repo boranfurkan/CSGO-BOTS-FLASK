@@ -24,6 +24,7 @@ $(document).ready(function() {
         csgoMarket.innerHTML += message + "\n";
         csgoMarket.scrollTop = csgoMarket.scrollHeight;
     })
+
 })
 
 function start(channel){
