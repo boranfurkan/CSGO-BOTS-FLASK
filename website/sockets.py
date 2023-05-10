@@ -1,12 +1,18 @@
 import time
-from flask_socketio import SocketIO, emit
-from flask_login import current_user
-from .models import Config, Item
-from website.utils.shadowpay import Shadow
-from website.utils.waxpeer import Waxpeer
 from threading import Thread
 
+from flask_login import current_user
+from flask_socketio import SocketIO, emit
+from flask import session
+
+from website.utils.shadowpay import Shadow
+from website.utils.waxpeer import Waxpeer
+from .models import Config, Item
+
 socketio = SocketIO()
+is_shadowpay_working = False
+is_waxpeer_working = False
+is_csgo_market_working = False
 
 
 @socketio.on('connect')
@@ -22,20 +28,17 @@ def handle_disconnect():
 
 @socketio.on("shadowpay")
 def handle_new_message(message):
-    stop_thread = False
+    global is_shadowpay_working
     all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
     shadowpay = Shadow(user_token=all_user_configs.shadow_user_token,
                        merchant_token=all_user_configs.shadow_merchant_token,
                        discount=all_user_configs.shadowpay_discount)
 
-    if not stop_thread:
-        socketio.emit("shadowpay", "Waiting user to start application! ")
-
     def shadow_run():
-        while not stop_thread:
+        while is_shadowpay_working:
             try:
                 shadowpay.create_links()
-                time.sleep(0.1)
+                time.sleep(0.05)
                 shadowpay.set_logs([])
                 logs = shadowpay.update_items()
                 shadowpay.set_items_to_update([])
@@ -49,8 +52,8 @@ def handle_new_message(message):
     shadowpay_thread = Thread(target=shadow_run)
 
     if message == "start":
-        print("Shadowpay start!")
-        stop_thread = False
+        session['shadow_state'] = 'active'
+        is_shadowpay_working = True
         all_user_items = {}
         items = Item.query.filter_by(user_id=current_user.id).all()
         for item in items:
@@ -59,22 +62,14 @@ def handle_new_message(message):
         shadowpay.get_inventory(user_items=all_user_items)
 
         shadowpay_thread.start()
+        socketio.emit("shadowpay", "Bot is successfully started!")
 
     elif message == "stop":
-        if shadowpay_thread.is_alive():
-            stop_thread = True
-            emit("shadowpay", "Bot is successfully stopped!")
+        if is_shadowpay_working:
+            is_shadowpay_working = False
+            socketio.emit("shadowpay", "Bot is successfully stopped!")
         else:
-            emit("shadowpay", "Bot is not working!")
-
-    elif message == "restart":
-        if shadowpay_thread.is_alive():
-            stop_thread = True
-            shadowpay_thread.start()
-            shadowpay_thread.join()
-            emit("shadowpay", "Bot is successfully restarted!")
-        else:
-            emit("shadowpay", "Bot is not working!")
+            socketio.emit("shadowpay", "Bot is not working!")
 
 
 @socketio.on("waxpeer")
@@ -101,14 +96,13 @@ def handle_new_message(message):
                 is_online = waxpeer.make_user_online()
                 socketio.emit("waxpeer", is_online)
 
-                time.sleep(20)
+                time.sleep(10)
             except BaseException as error:
                 socketio.emit("waxpeer", error)
 
     waxpeer_thread = Thread(target=waxpeer_run)
 
     if message == "start":
-        print("Shadowpay start!")
         stop_thread = False
         all_user_items = {}
         items = Item.query.filter_by(user_id=current_user.id).all()
@@ -120,16 +114,8 @@ def handle_new_message(message):
         waxpeer_thread.start()
 
     elif message == "stop":
-        if waxpeer_thread.is_alive():
+        if not stop_thread:
             stop_thread = True
             emit("waxpeer", "Bot is successfully stopped!")
-        else:
-            emit("waxpeer", "Bot is not working!")
-
-    elif message == "restart":
-        if waxpeer_thread.is_alive():
-            stop_thread = True
-            waxpeer_thread.start()
-            emit("waxpeer", "Bot is successfully restarted!")
         else:
             emit("waxpeer", "Bot is not working!")

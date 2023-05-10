@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from .api_utils import get_user_items
-from .models import Config, Item
+from .models import Config, Item, BotStatus
 from .logger import logger
 from .database import db
 import asyncio
@@ -17,8 +17,16 @@ def home():
     if request.method == 'GET':
         if not current_user.configs:
             return redirect(url_for('views.configs'))
-        else:
+
+        elif not current_user.bot_status:
+            new_bot_status = BotStatus(user_id=current_user.id)
+            db.session.add(new_bot_status)
+            db.session.commit()
             return render_template("home.html", user=current_user)
+
+        else:
+            user_bot_status = BotStatus.query.filter_by(user_id=current_user.id).first()
+            return render_template("home.html", user=current_user, user_bot_status=user_bot_status)
 
 
 @views.route('/configs', methods=['GET', 'POST'])
@@ -54,7 +62,8 @@ def configs():
                 if current_rate != suggested_rate:
                     all_user_items = Item.query.filter_by(user_id=current_user.id).all()
                     for item in all_user_items:
-                        item.suggested_price = float(item.buff_listing_7 * suggested_rate).__round__(2)
+                        if item.is_special_priced != 1 or item.is_special_priced != True:
+                            item.suggested_price = float(item.buff_listing_7 * suggested_rate).__round__(2)
                     flash('Successfully updated the item prices according to new current_rate!', category='success')
 
                 Config.query.filter_by(
@@ -149,17 +158,48 @@ def items():
 @views.route('/update-item', methods=['PATCH'])
 @login_required
 def update_item():
-    try:
-        item = json.loads(request.data)
-        item_id = item["itemId"]
-        new_suggested_price = item["newSuggestedPrice"]
-        item = Item.query.get_or_404(item_id)
-        item.suggested_price = new_suggested_price
-        db.session.commit()
-        logger.info("success")
-        flash('Successfully updated the item!', category='success')
-        return jsonify({"status": "success"})
+    if request.method == "PATCH":
+        try:
+            item = json.loads(request.data)
+            item_id = item["itemId"]
+            new_suggested_price = item["newSuggestedPrice"]
+            item = Item.query.get_or_404(item_id)
+            item.suggested_price = new_suggested_price
+            item.is_special_priced = True
+            db.session.commit()
+            logger.info("success")
+            flash('Successfully updated the item!', category='success')
+            return jsonify({"status": "success"})
 
-    except BaseException as error:
-        logger.error(error)
-        return jsonify({"status": "error", "details": error})
+        except BaseException as error:
+            logger.error(error)
+            return jsonify({"status": "error", "details": error})
+
+
+@views.route('/update-bot-status', methods=['POST'])
+def update_bot_status():
+    if request.method == "POST":
+        try:
+            bot = json.loads(request.data)
+            bot_name = bot["name"]
+            new_status = bot["status"]
+
+            if bot_name == "shadowpay":
+                user_shadow_bot = BotStatus.query.filter_by(user_id=current_user.id)
+                user_shadow_bot.update(dict(shadow_bot=new_status))
+                db.session.commit()
+            elif bot_name == "waxpeer":
+                user_waxpeer_bot = BotStatus.query.filter_by(user_id=current_user.id)
+                user_waxpeer_bot.update(dict(waxpeer_bot=new_status))
+                db.session.commit()
+            elif bot_name == "csgo_market":
+                user_csgo_market_bot = BotStatus.query.filter_by(user_id=current_user.id)
+                user_csgo_market_bot.update(dict(csgo_market=new_status))
+                db.session.commit()
+
+            flash('Successfully changed bot status!', category='success')
+            return redirect(url_for('views.home'))
+
+        except BaseException as error:
+            logger.error(error)
+            return jsonify({"status": "error", "details": error})

@@ -3,20 +3,13 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 
 
-class Note(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.String(10000))
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     configs = db.relationship('Config')
-    notes = db.relationship('Note')
+    bot_status = db.relationship('BotStatus')
 
 
 class Config(db.Model):
@@ -46,5 +39,14 @@ class Item(db.Model):
     shadow_price = db.Column(db.Integer)
     waxpeer_price = db.Column(db.Integer)
     market_price = db.Column(db.Integer)
+    is_special_priced = db.Column(db.Boolean, default=False)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class BotStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shadow_bot = db.Column(db.Boolean, default=False)
+    waxpeer_bot = db.Column(db.Boolean, default=False)
+    csgo_market_bot = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

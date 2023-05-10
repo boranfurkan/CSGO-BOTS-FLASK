@@ -4,14 +4,18 @@
   <div class="log-header">
       <h2>SHADOWPAY</h2>
       <div>
-          <button class="btn btn-success " onclick="start('shadowpay')">Start</button>
-          <button class="btn btn-danger disabled" onclick="stop('shadowpay')">Stop</button>
-          <button class="btn btn-warning disabled" onclick="stop('shadowpay')">Restart</button>
+          <button class="btn btn-success" onclick="start('shadowpay')"
+                  {% if user_bot_status.shadow_bot%}disabled{% endif %}>Start</button>
+
+          <button class="btn btn-danger" onclick="stop('shadowpay')"
+                  {% if not user_bot_status.shadow_bot%}disabled{% endif %}>Stop</button>
+
+          <button class="btn btn-warning" onclick="restart('shadowpay')">Restart</button>
       </div>
   </div>
   <div class="card">
     <div class="card-body">
-      <pre id="shadow" class="log-area"></pre>
+      <pre id="shadow" class="log-area">{% if not user_bot_status.shadow_bot%}Waiting user to start the bot...{% endif %}</pre>
     </div>
   </div>
 
@@ -21,14 +25,18 @@
   <div class="log-header">
       <h2>WAXPEER</h2>
       <div>
-          <button class="btn btn-success" onclick="start('waxpeer')">Start</button>
-          <button class="btn btn-danger disabled" onclick="stop('waxpeer')">Stop</button>
-          <button class="btn btn-warning disabled" onclick="stop('waxpeer')">Restart</button>
+          <button class="btn btn-success" onclick="start('waxpeer')"
+                  {% if user_bot_status.waxpeer_bot%}disabled={% endif %}>Start</button>
+
+          <button class="btn btn-danger" onclick="stop('waxpeer')"
+                  {% if not user_bot_status.waxpeer_bot%}disabled{% endif %}>Stop</button>
+
+          <button class="btn btn-warning" onclick="restart('waxpeer')">Restart</button>
       </div>
   </div>
   <div class="card">
     <div class="card-body">
-      <pre id="waxpeer" class="log-area"></pre>
+      <pre id="waxpeer" class="log-area">{% if not user_bot_status.waxpeer_bot%}Waiting user to start the bot...{% endif %}</pre>
     </div>
   </div>
 
@@ -38,14 +46,18 @@
   <div class="log-header">
       <h2>CSGO MARKET</h2>
       <div>
-          <button class="btn btn-success" onclick="start('market')">Start</button>
-          <button class="btn btn-danger disabled" onclick="stop('market')">Stop</button>
-          <button class="btn btn-warning disabled" onclick="stop('market')">Restart</button>
+          <button class="btn btn-success" onclick="start('csgo_market')"
+                  {% if user_bot_status.csgo_market_bot%}disabled={% endif %}>Start</button>
+
+          <button class="btn btn-danger" onclick="stop('csgo_market')"
+                  {% if not user_bot_status.csgo_market_bot%}disabled{% endif %}>Stop</button>
+
+          <button class="btn btn-warning" onclick="restart('csgo_market')">Restart</button>
       </div>
   </div>
   <div class="card">
     <div class="card-body">
-      <pre id="market" class="log-area"></pre>
+      <pre id="market" class="log-area">{% if not user_bot_status.csgo_market_bot%}Waiting user to start the bot...{% endif %}</pre>
     </div>
   </div>
 </div>
