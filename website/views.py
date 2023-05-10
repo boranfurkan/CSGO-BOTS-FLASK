@@ -194,7 +194,7 @@ def update_bot_status():
                 db.session.commit()
             elif bot_name == "csgo_market":
                 user_csgo_market_bot = BotStatus.query.filter_by(user_id=current_user.id)
-                user_csgo_market_bot.update(dict(csgo_market=new_status))
+                user_csgo_market_bot.update(dict(csgo_market_bot=new_status))
                 db.session.commit()
 
             flash('Successfully changed bot status!', category='success')

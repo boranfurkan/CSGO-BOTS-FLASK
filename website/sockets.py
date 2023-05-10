@@ -3,10 +3,11 @@ from threading import Thread
 
 from flask_login import current_user
 from flask_socketio import SocketIO, emit
-from flask import session
 
 from website.utils.shadowpay import Shadow
 from website.utils.waxpeer import Waxpeer
+from website.utils.csgo_market import CsgoMarket
+
 from .models import Config, Item
 
 socketio = SocketIO()
@@ -52,7 +53,6 @@ def handle_new_message(message):
     shadowpay_thread = Thread(target=shadow_run)
 
     if message == "start":
-        session['shadow_state'] = 'active'
         is_shadowpay_working = True
         all_user_items = {}
         items = Item.query.filter_by(user_id=current_user.id).all()
@@ -74,16 +74,13 @@ def handle_new_message(message):
 
 @socketio.on("waxpeer")
 def handle_new_message(message):
-    stop_thread = False
+    global is_waxpeer_working
     all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
     waxpeer = Waxpeer(token=all_user_configs.waxpeer_token, cookie=all_user_configs.waxpeer_cookie,
                       discount=all_user_configs.waxpeer_discount)
 
-    if not stop_thread:
-        socketio.emit("waxpeer", "Waiting user to start application! ")
-
     def waxpeer_run():
-        while not stop_thread:
+        while is_waxpeer_working:
             try:
                 waxpeer.request_market_data()
                 waxpeer.set_logs([])
@@ -103,7 +100,7 @@ def handle_new_message(message):
     waxpeer_thread = Thread(target=waxpeer_run)
 
     if message == "start":
-        stop_thread = False
+        is_waxpeer_working = True
         all_user_items = {}
         items = Item.query.filter_by(user_id=current_user.id).all()
         for item in items:
@@ -114,8 +111,55 @@ def handle_new_message(message):
         waxpeer_thread.start()
 
     elif message == "stop":
-        if not stop_thread:
-            stop_thread = True
+        if is_waxpeer_working:
+            is_waxpeer_working = False
             emit("waxpeer", "Bot is successfully stopped!")
         else:
             emit("waxpeer", "Bot is not working!")
+
+
+@socketio.on("csgo_market")
+def handle_new_message(message):
+    global is_csgo_market_working
+    all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
+    csgo_market = CsgoMarket(secret_key=all_user_configs.csgo_market_token, discount=all_user_configs.market_discount)
+
+    def csgo_market_run():
+        while is_csgo_market_working:
+            try:
+                csgo_market.create_links()
+                csgo_market.request_market_data()
+                csgo_market.set_logs([])
+                logs = csgo_market.update_items()
+                csgo_market.set_items_to_update({})
+                csgo_market.set_links_array([])
+                csgo_market.set_market_data({})
+                for log in logs:
+                    socketio.emit("csgo_market", log)
+
+                is_online = csgo_market.make_user_online()
+                socketio.emit("csgo_market", is_online)
+                time.sleep(3)
+            except BaseException as error:
+                socketio.emit("csgo_market", error)
+
+    csgo_market_thread = Thread(target=csgo_market_run)
+
+    if message == "start":
+        is_csgo_market_working = True
+        all_user_items = {}
+        items = Item.query.filter_by(user_id=current_user.id).all()
+        for item in items:
+            all_user_items[item.name] = item.suggested_price
+
+        csgo_market.get_inventory(user_items=all_user_items)
+
+        csgo_market_thread.start()
+        socketio.emit("csgo_market", "Bot is successfully started!")
+
+    elif message == "stop":
+        if is_csgo_market_working:
+            is_csgo_market_working = False
+            socketio.emit("csgo_market", "Bot is successfully stopped!")
+        else:
+            socketio.emit("csgo_market", "Bot is not working!")

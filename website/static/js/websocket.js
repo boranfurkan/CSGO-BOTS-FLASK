@@ -6,6 +6,7 @@ let mySocket = null
 
 $(document).ready(function() {
     mySocket = socketConnect()
+
     mySocket.on("shadowpay", function(message){
         let shadow = $("#shadow")[0]
         shadow.innerHTML += message + "\n";
@@ -15,7 +16,13 @@ $(document).ready(function() {
     mySocket.on("waxpeer", function(message){
         let waxpeer = $("#waxpeer")[0]
         waxpeer.innerHTML += message + "\n";
-        waxpeer.scrollTop = shadow.scrollHeight;
+        waxpeer.scrollTop = waxpeer.scrollHeight;
+    })
+
+    mySocket.on("csgo_market", function(message){
+        let csgoMarket = $("#csgo-market")[0]
+        csgoMarket.innerHTML += message + "\n";
+        csgoMarket.scrollTop = csgoMarket.scrollHeight;
     })
 })
 
