@@ -14,9 +14,13 @@ class CsgoMarket:
         self.__history = {}
         self.__items_to_update = {}
         self.__logs = []
+        self.__user_headers = {
+            "Content-Type": "application/json",
+        }
 
     def get_inventory(self, user_items):
-        response = requests.get(f"https://market.csgo.com/api/v2/items?key={self.key}").json()
+        response = requests.get(f"https://market.csgo.com/api/v2/items?key={self.key}",
+                                headers=self.__user_headers).json()
 
         for item in response["items"]:
             item_name = item["market_hash_name"]
@@ -46,22 +50,21 @@ class CsgoMarket:
     def request_market_data(self):
         counter = 0
         for url in self.__links_array:
+            response = requests.get(url, headers=self.__user_headers).json()
+            for item in response["data"]:
+                item_name = item
+                for unique_item in response["data"][item_name]:
+                    item_id = unique_item["id"]
+                    item_price = int(unique_item["price"])
+                    if item_name not in self.__market_data:
+                        self.__market_data[item_name] = []
+                        self.__market_data[item_name].append({"id": item_id, "price": item_price})
+                    else:
+                        self.__market_data[item_name].append({"id": item_id, "price": item_price})
             counter += 1
-            if counter == 5:
+            if counter == 3:
+                time.sleep(2)
                 counter = 0
-                time.sleep(1)
-            else:
-                response = requests.get(url).json()
-                for item in response["data"]:
-                    item_name = item
-                    for unique_item in response["data"][item_name]:
-                        item_id = unique_item["id"]
-                        item_price = int(unique_item["price"])
-                        if item_name not in self.__market_data:
-                            self.__market_data[item_name] = []
-                            self.__market_data[item_name].append({"id": item_id, "price": item_price})
-                        else:
-                            self.__market_data[item_name].append({"id": item_id, "price": item_price})
         for item in self.__market_data:
             self.__market_data[item].sort(key=lambda x: x["price"])
         return self.__market_data
@@ -97,19 +100,14 @@ class CsgoMarket:
                 self.__items_to_update[item]["item_id"] = id_to_update
                 self.__items_to_update[item]["price"] = price_to_update
 
-        counter = 0
         for item, values in self.__items_to_update.items():
             item_name = item
             item_id = values["item_id"]
             item_price = values["price"]
-            counter += 1
-            if counter == 4:
-                counter = 0
-                time.sleep(1)
-            else:
-                response = requests.post(f"https://market.csgo.com/api/v2/set-price?key={self.key}&item_id={item_id}"
-                                         f"&price={item_price}&cur=USD").json()
-                self.__logs.append(f"{item_name} is updated to: {item_price}, {response}")
+            response = requests.post(f"https://market.csgo.com/api/v2/set-price?key={self.key}&item_id={item_id}"
+                                     f"&price={item_price}&cur=USD", headers=self.__user_headers).json()
+            time.sleep(2)
+            self.__logs.append(f"{item_name} is updated to: {item_price}, {response}")
 
         return self.get_logs()
 

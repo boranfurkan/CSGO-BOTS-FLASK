@@ -131,7 +131,7 @@ def handle_csgo_market(message):
                 csgo_market.create_links()
                 csgo_market.request_market_data()
                 csgo_market.set_logs([])
-                time.sleep(1)
+                time.sleep(2)
                 logs = csgo_market.update_items()
                 csgo_market.set_items_to_update({})
                 csgo_market.set_links_array([])
@@ -139,7 +139,7 @@ def handle_csgo_market(message):
                 for log in logs:
                     socketio.emit("csgo_market", log)
 
-                time.sleep(1)
+                time.sleep(2)
                 is_online = csgo_market.make_user_online()
                 socketio.emit("csgo_market", is_online)
             except BaseException as error:

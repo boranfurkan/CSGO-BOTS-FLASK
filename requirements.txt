@@ -1,7 +1,7 @@
 flask==2.3.2
 Flask-SQLAlchemy
 flask-login
-SQLAlchemy==2.0.12
+SQLAlchemy==2.0.13
 requests==2.30.0
 gspread~=5.8.0
-Werkzeug~=2.3.3
+Werkzeug==2.3.4

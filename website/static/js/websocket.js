@@ -24,24 +24,23 @@ $(document).ready(function() {
         csgoMarket.innerHTML += message + "\n";
         csgoMarket.scrollTop = csgoMarket.scrollHeight;
     })
-
 })
 
 function start(channel){
     mySocket.emit(channel, "start")
     changeBotStatus(channel, true)
-    setTimeout(() => {document.location.reload();}, 100);
+    setTimeout(() => {document.location.reload();}, 10);
 }
 
 function stop(channel){
     mySocket.emit(channel, "stop")
     changeBotStatus(channel, false)
-    setTimeout(() => {document.location.reload();}, 100);
+    setTimeout(() => {document.location.reload();}, 10);
 }
 
 function restart(channel){
     mySocket.emit(channel, "stop")
-    setTimeout(() => {document.location.reload();}, 100);
+    setTimeout(() => {document.location.reload();}, 10);
     mySocket.emit(channel, "start")
     changeBotStatus(channel, true)
 }
