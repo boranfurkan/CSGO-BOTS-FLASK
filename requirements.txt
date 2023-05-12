@@ -3,5 +3,6 @@ Flask-SQLAlchemy
 flask-login
 SQLAlchemy==2.0.13
 requests==2.30.0
-gspread~=5.8.0
+gspread==5.9.0
 Werkzeug==2.3.4
+flask-socketio==5.3.4

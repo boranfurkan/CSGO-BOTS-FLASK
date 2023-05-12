@@ -47,7 +47,7 @@ def configs():
         if not (bool(suggested_rate) and bool(shadow_user_token) and bool(shadow_merchant_token) and bool(waxpeer_token)
                 and bool(csgo_market_token) and bool(shadowpay_discount) and bool(waxpeer_discount) and bool(
                     waxpeer_cookie)):
-            flash('You should fill the form fully!!', category='error')
+            return jsonify({"status": "error", "details": "You should fill the form fully!"})
         else:
             if not current_user.configs:
                 new_config = Config(suggested_rate=suggested_rate, shadow_user_token=shadow_user_token,
@@ -57,7 +57,7 @@ def configs():
                                     waxpeer_cookie=waxpeer_cookie, user_id=current_user.id)
                 db.session.add(new_config)
                 db.session.commit()
-                flash('Successfully updated the configs!', category='success')
+                return jsonify({"status": "success", "details": "Successfully updated the configs!"})
             else:
                 current_rate = Config.query.filter_by(user_id=current_user.id).first().suggested_rate
                 if current_rate != suggested_rate:
@@ -65,7 +65,8 @@ def configs():
                     for item in all_user_items:
                         if item.is_special_priced != 1 or item.is_special_priced != True:
                             item.suggested_price = float(item.buff_listing_7 * suggested_rate).__round__(2)
-                    flash('Successfully updated the item prices according to new current_rate!', category='success')
+                    return jsonify({"status": "success", "details": "Successfully updated the item prices according "
+                                                                    "to new current_rate!"})
 
                 Config.query.filter_by(
                     user_id=current_user.id).update(
@@ -77,10 +78,10 @@ def configs():
                          waxpeer_discount=waxpeer_discount, market_discount=market_discount,
                          waxpeer_cookie=waxpeer_cookie, user_id=current_user.id))
                 db.session.commit()
-                flash('Successfully updated the configs!', category='success')
+                return jsonify({"status": "success", "details": "Successfully updated the configs!"})
     elif request.method == "GET":
         if not current_user.configs:
-            flash('You should set up your configs first!', category='error')
+            return jsonify({"status": "error", "details": "You should set up your configs first!"})
     return render_template("configs.html", user=current_user)
 
 
@@ -159,7 +160,6 @@ def update_item():
             item.is_special_priced = True
             db.session.commit()
             logger.info("success")
-            flash('Successfully updated the item!', category='success')
             return jsonify({"status": "success"})
 
         except BaseException as error:
