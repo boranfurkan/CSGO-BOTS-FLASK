@@ -1,12 +1,11 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .api_utils import get_user_items
+from website.utils.api_utils import get_user_items
 from .models import Config, Item, BotStatus
-from .logger import logger
-from .database import db
+from website.logger.logger import logger
+from website.db.db import db
 import asyncio
 import json
-import time
 
 views = Blueprint('views', __name__)
 

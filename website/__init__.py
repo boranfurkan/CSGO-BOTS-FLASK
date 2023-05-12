@@ -1,7 +1,7 @@
 from flask import Flask
-from .database import db, DB_NAME
+from website.db.db import db, DB_NAME
 from flask_login import LoginManager
-from .sockets import socketio
+from .web_socket import socketio
 from os import path
 
 

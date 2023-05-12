@@ -1,7 +1,7 @@
 import asyncio
 import requests
 import gspread
-from .logger import logger
+from website.logger.logger import logger
 
 
 async def get_user_items(shadow_token, waxpeer_token, csgo_market_token):
@@ -12,7 +12,7 @@ async def get_user_items(shadow_token, waxpeer_token, csgo_market_token):
     try:
         async def get_buff():
             buff_items = {}
-            service_account = gspread.service_account(filename="website/buff_keys.json")
+            service_account = gspread.service_account(filename="website/utils/buff_keys.json")
             sheet = service_account.open("Buff Data")
             worksheet = sheet.worksheet("Sheet1")
             buff_data = worksheet.get_all_records()
