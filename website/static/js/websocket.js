@@ -9,20 +9,41 @@ $(document).ready(function() {
 
     mySocket.on("shadowpay", function(message){
         let shadow = $("#shadow")[0]
-        shadow.innerHTML += message + "\n";
-        shadow.scrollTop = shadow.scrollHeight;
+        if(typeof message === "object"){
+            for (const log of message) {
+              shadow.innerHTML += log + "\n";
+              shadow.scrollTop = shadow.scrollHeight;}
+        }
+        else{
+            shadow.innerHTML += message + "\n";
+            shadow.scrollTop = shadow.scrollHeight;
+        }
     })
 
     mySocket.on("waxpeer", function(message){
         let waxpeer = $("#waxpeer")[0]
-        waxpeer.innerHTML += message + "\n";
-        waxpeer.scrollTop = waxpeer.scrollHeight;
+        if(typeof message === "object"){
+            for (const log of message) {
+              waxpeer.innerHTML += log + "\n";
+              waxpeer.scrollTop = waxpeer.scrollHeight;}
+        }
+        else{
+            waxpeer.innerHTML += message + "\n";
+            waxpeer.scrollTop = waxpeer.scrollHeight;
+        }
     })
 
     mySocket.on("csgo_market", function(message){
         let csgoMarket = $("#csgo-market")[0]
-        csgoMarket.innerHTML += message + "\n";
-        csgoMarket.scrollTop = csgoMarket.scrollHeight;
+        if(typeof message === "object"){
+            for (const log of message) {
+              csgoMarket.innerHTML += log + "\n";
+              csgoMarket.scrollTop = csgoMarket.scrollHeight;}
+        }
+        else{
+            csgoMarket.innerHTML += message + "\n";
+            csgoMarket.scrollTop = csgoMarket.scrollHeight;
+        }
     })
 })
 
