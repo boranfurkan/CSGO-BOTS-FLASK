@@ -47,7 +47,7 @@ def handle_shadowpay(message):
                 socketio.emit("shadowpay", logs)
             except BaseException as error:
                 print(error)
-                socketio.emit("shadowpay", error)
+                socketio.emit("shadowpay", str(error))
 
     shadowpay_thread = Thread(target=shadow_run)
 
@@ -93,7 +93,7 @@ def handle_waxpeer(message):
                 time.sleep(10)
             except BaseException as error:
                 print(error)
-                socketio.emit("waxpeer", error)
+                socketio.emit("waxpeer", str(error))
 
     waxpeer_thread = Thread(target=waxpeer_run)
 
@@ -128,7 +128,6 @@ def handle_csgo_market(message):
                 csgo_market.create_links()
                 csgo_market.request_market_data()
                 csgo_market.set_logs([])
-                time.sleep(2)
                 logs = csgo_market.update_items()
                 csgo_market.set_items_to_update({})
                 csgo_market.set_links_array([])
@@ -136,12 +135,12 @@ def handle_csgo_market(message):
 
                 socketio.emit("csgo_market", logs)
 
-                time.sleep(2)
+                time.sleep(1)
                 is_online = csgo_market.make_user_online()
                 socketio.emit("csgo_market", is_online)
             except BaseException as error:
                 print(error)
-                socketio.emit("csgo_market", error)
+                socketio.emit("csgo_market", str(error))
 
     csgo_market_thread = Thread(target=csgo_market_run)
 

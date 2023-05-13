@@ -43,7 +43,7 @@ def configs():
         market_discount = float(request.form.get('market_discount')).__round__(2)
         waxpeer_cookie = str(request.form.get('waxpeer_cookie')).strip()
 
-        if (bool(suggested_rate) and bool(shadow_user_token) and bool(shadow_merchant_token) and bool(waxpeer_token)
+        if not (bool(suggested_rate) and bool(shadow_user_token) and bool(shadow_merchant_token) and bool(waxpeer_token)
                 and bool(csgo_market_token) and bool(shadowpay_discount) and bool(waxpeer_discount) and bool(
                     waxpeer_cookie)):
             return jsonify({"status": "error", "details": "You should fill the form fully!"})

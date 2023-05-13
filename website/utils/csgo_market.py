@@ -62,8 +62,8 @@ class CsgoMarket:
                     else:
                         self.__market_data[item_name].append({"id": item_id, "price": item_price})
             counter += 1
-            if counter == 3:
-                time.sleep(2)
+            if counter == 5:
+                time.sleep(1)
                 counter = 0
         for item in self.__market_data:
             self.__market_data[item].sort(key=lambda x: x["price"])
@@ -100,13 +100,17 @@ class CsgoMarket:
                 self.__items_to_update[item]["item_id"] = id_to_update
                 self.__items_to_update[item]["price"] = price_to_update
 
+        counter = 0
         for item, values in self.__items_to_update.items():
             item_name = item
             item_id = values["item_id"]
             item_price = values["price"]
             response = requests.post(f"https://market.csgo.com/api/v2/set-price?key={self.key}&item_id={item_id}"
                                      f"&price={item_price}&cur=USD", headers=self.__user_headers).json()
-            time.sleep(2)
+            counter += 1
+            if counter == 5:
+                time.sleep(1)
+                counter = 0
             self.__logs.append(f"{item_name} is updated to: {item_price}, {response}")
 
         return self.get_logs()
