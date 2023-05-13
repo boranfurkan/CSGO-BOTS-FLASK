@@ -54,6 +54,17 @@ function checkActivePage(){
     break;
   case "/configs":
     $("#configs")[0].classList.add("active")
+    $('#configs-form').ajaxForm({
+        url : '/configs',
+        dataType : 'json',
+        success : function (response) {
+            if(response.status === "success"){
+              showToast('Success', response.details, 'success');
+            }else{
+              showToast('Error', response.details, 'danger');
+            }
+        }
+    })
     break;
   case "/login":
     $("#login")[0].classList.add("active")
@@ -73,7 +84,7 @@ function updateItem(itemId) {
       document.getElementById(itemId).value = newSuggestedPrice
       showToast('Success', 'The operation was successful!', 'success');
     }else{
-      showToast('Error', _res.statusText, 'error');
+      showToast('Error', _res.statusText, 'danger');
       location.reload()
     }
   });
@@ -87,17 +98,5 @@ function addSearchLogo(){
     const element = $(".search-input")[0]
     element.setAttribute("placeholder", "Enter Your Search Here")
     $(newNode).insertAfter(element)
-
   }
 }
-$('#configs-form').ajaxForm({
-        url : '/configs',
-        dataType : 'json',
-        success : function (response) {
-            if(response.status === "success"){
-              showToast('Success', response.details, 'success');
-            }else{
-              showToast('Error', response.details, 'error');
-            }
-        }
-})

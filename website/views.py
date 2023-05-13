@@ -43,7 +43,7 @@ def configs():
         market_discount = float(request.form.get('market_discount')).__round__(2)
         waxpeer_cookie = str(request.form.get('waxpeer_cookie')).strip()
 
-        if not (bool(suggested_rate) and bool(shadow_user_token) and bool(shadow_merchant_token) and bool(waxpeer_token)
+        if (bool(suggested_rate) and bool(shadow_user_token) and bool(shadow_merchant_token) and bool(waxpeer_token)
                 and bool(csgo_market_token) and bool(shadowpay_discount) and bool(waxpeer_discount) and bool(
                     waxpeer_cookie)):
             return jsonify({"status": "error", "details": "You should fill the form fully!"})
@@ -78,9 +78,11 @@ def configs():
                          waxpeer_cookie=waxpeer_cookie, user_id=current_user.id))
                 db.session.commit()
                 return jsonify({"status": "success", "details": "Successfully updated the configs!"})
+
     elif request.method == "GET":
         if not current_user.configs:
-            return jsonify({"status": "error", "details": "You should set up your configs first!"})
+            flash('You should set up your configs first!', category='error')
+            return render_template("configs.html", user=current_user)
     return render_template("configs.html", user=current_user)
 
 
@@ -140,6 +142,7 @@ def items():
                         db.session.add(new_item)
                         db.session.commit()
                 user_items = Item.query.filter_by(user_id=current_user.id).all()
+                flash('Successfully Loaded All Items!', category='success')
                 return render_template("items.html", user=current_user, user_items=user_items)
             else:
                 flash('Could not fetch user inventory. Please try again in 2 minutes.', category='error')
@@ -173,6 +176,7 @@ def update_bot_status():
             bot = json.loads(request.data)
             bot_name = bot["name"]
             new_status = bot["status"]
+            operation_type = bot["type"]
 
             if bot_name == "shadowpay":
                 user_shadow_bot = BotStatus.query.filter_by(user_id=current_user.id)
@@ -187,8 +191,14 @@ def update_bot_status():
                 user_csgo_market_bot.update(dict(csgo_market_bot=new_status))
                 db.session.commit()
 
-            flash('Successfully changed bot status!', category='success')
-            return redirect(url_for('views.home'))
+            if operation_type == "start":
+                flash('Bot successfully started!', category='success')
+            elif operation_type == "restart":
+                flash('Bot successfully restarted!', category='success')
+            else:
+                flash('Bot successfully stopped!', category='success')
+
+            return jsonify({"status": "success"})
 
         except BaseException as error:
             logger.error(error)

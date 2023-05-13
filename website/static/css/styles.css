@@ -168,6 +168,29 @@ body{
     width: 60%;
 }
 
-.toast .bg-success .toast-body{
-    background-color: #fab007;
+input:focus, .form-control:focus {
+    border-color: #fab007;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem #fab007;
+}
+
+.sale-price{
+    background-color: #212529;
+    color: white;
+    border: 1px solid #fab007;
+    padding-left: 5px;
+    border-radius: 3px;
+
+}
+
+.login-form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.login-form > form{
+    margin-top: 1%;
+    width: 50%;
 }

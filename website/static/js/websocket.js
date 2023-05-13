@@ -49,33 +49,23 @@ $(document).ready(function() {
 
 function start(channel){
     mySocket.emit(channel, "start")
-    changeBotStatus(channel, true)
-    setTimeout(() => {document.location.reload();}, 10);
+    changeBotStatus(channel, true, "start")
 }
 
 function stop(channel){
     mySocket.emit(channel, "stop")
-    changeBotStatus(channel, false)
-    setTimeout(() => {document.location.reload();}, 10);
+    changeBotStatus(channel, false, "stop")
 }
 
 function restart(channel){
     mySocket.emit(channel, "stop")
-    setTimeout(() => {document.location.reload();}, 10);
     mySocket.emit(channel, "start")
-    changeBotStatus(channel, true)
+    changeBotStatus(channel, true, "restart")
 }
 
-function changeBotStatus(name, status) {
+function changeBotStatus(name, status, type) {
   fetch("/update-bot-status", {
     method: "POST",
-    body: JSON.stringify({ name: name, status: status}),
-  }).then((_res) => {
-    if(_res.ok){
-      console.log("success")
-    }else{
-      console.log(_res.statusText)
-      window.location.href = "/configs";
-    }
-  });
+    body: JSON.stringify({ name: name, status: status, type: type}),
+  }).then(setTimeout(() => {document.location.reload();}, 10))
 }

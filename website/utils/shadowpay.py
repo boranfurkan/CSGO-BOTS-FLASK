@@ -20,7 +20,7 @@ class Shadow:
 
         self.__merchant_headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer a45adc51b11213f49700bbae01335fa6"
+            "Authorization": f"Bearer {self.merchant_token}"
         }
 
     def get_inventory(self, user_items):

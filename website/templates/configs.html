@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% block title %}Configs{% endblock %} {% block
 content %}
+
 <h3 align="center">User Configs</h3>
 <form name="configsForm" id="configs-form" method="POST">
   <div class="left-form">
@@ -153,4 +154,13 @@ content %}
   <br />
   <button type="submit" class="btn btn-primary form-submit">Submit</button>
 </form>
+
+<script>
+    {% if show_info == "True" %}
+        $(document).ready(function() {
+            showToast('Error', "you should first fill the configs first!", 'danger');
+        })
+    {% endif %}
+</script>
+
 {% endblock %}

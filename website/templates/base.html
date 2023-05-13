@@ -46,10 +46,10 @@
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link" id="login" href="/login">Logout</a>
+              <a class="nav-link" id="login" href="/login">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="signUp" href="/sign-up">Logout</a>
+              <a class="nav-link" id="signUp" href="/sign-up">Sign up</a>
             </li>
             {% endif %}
           </ul>
@@ -61,6 +61,17 @@
       <div class="toast-container">
       </div>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %} {% if category =='error' %}
+        <script>$(document).ready(function() {
+         showToast('Error', '{{ message }}', 'danger')})
+        </script>
+    {% else %}
+        <script>$(document).ready(function() {
+         showToast('Success', '{{ message }}', 'success')})
+        </script>
+    {% endif %} {% endfor %} {% endif %} {% endwith %}
 
     <div class="container-fluid">
         <div class="root">{% block content %} {% endblock %}</div>
