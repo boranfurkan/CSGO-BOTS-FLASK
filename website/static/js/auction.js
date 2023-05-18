@@ -1,12 +1,17 @@
 const domain = "csgoempire.com";
 const socketEndpoint = `wss://trade.${domain}/trade`;
 
-async function initSocket(userData) {
+$(document).ready(function() {
+  initSocket();
+})
+
+
+function initSocket(userData) {
     try {
         const socket = io(socketEndpoint, {
             path: "/s/",
             transports: ["websocket"],
-            extraHeaders: { "User-agent": `5265639 API Bot` },
+            extraHeaders: { "User-agent": `${userData.user.id} API Bot` },
             secure: true,
             rejectUnauthorized: false,
             reconnect: true,
@@ -48,7 +53,6 @@ async function initSocket(userData) {
             );
         });
 
-        // Listen for the following event to be emitted by the socket in error cases
         socket.on("close", (reason) =>
             console.log(`Socket closed: ${reason}`)
         );
@@ -63,6 +67,38 @@ async function initSocket(userData) {
     }
 }
 
-$(document).ready(function() {
-  initSocket();
-})
+function createCard(imageUrl, titleText, descriptionText, linkUrl, linkText) {
+  let card = document.createElement('div');
+  let img = document.createElement('img');
+  let cardBody = document.createElement('div');
+  let cardTitle = document.createElement('h5');
+  let cardText = document.createElement('p');
+  let cardLink = document.createElement('a');
+
+  // Set element classes as per bootstrap
+  card.className = 'card';
+  card.style.width = '18rem';
+  img.className = 'card-img-top';
+  cardBody.className = 'card-body';
+  cardTitle.className = 'card-title';
+  cardText.className = 'card-text';
+  cardLink.className = 'btn btn-primary';
+
+  // Set element content
+  img.src = imageUrl;
+  img.alt = 'Card image';
+  cardTitle.textContent = titleText;
+  cardText.textContent = descriptionText;
+  cardLink.href = linkUrl;
+  cardLink.textContent = linkText;
+
+  // Append elements
+  cardBody.appendChild(cardTitle);
+  cardBody.appendChild(cardText);
+  cardBody.appendChild(cardLink);
+  card.appendChild(img);
+  card.appendChild(cardBody);
+
+  // Add the new card to the card container
+  document.getElementById('cardContainer').appendChild(card);
+}

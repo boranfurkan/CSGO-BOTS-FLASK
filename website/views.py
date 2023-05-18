@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
+from website.utils.buy_utils import get_all_auction_data
 from flask_login import login_required, current_user
 from website.utils.sell_utils import get_user_items
 from .models import Config, Item, BotStatus
@@ -38,20 +39,23 @@ def configs():
         shadow_merchant_token = str(request.form.get('shadow_merchant_token')).strip()
         waxpeer_token = str(request.form.get('waxpeer_token')).strip()
         csgo_market_token = str(request.form.get('csgo_market_token')).strip()
+        csgo_empire_token = str(request.form.get('csgo_empire_token')).strip()
+        buff_rate = float(request.form.get('buff_rate')).__round__(2)
         shadowpay_discount = float(request.form.get('shadowpay_discount')).__round__(2)
         waxpeer_discount = float(request.form.get('waxpeer_discount')).__round__(2)
         market_discount = float(request.form.get('market_discount')).__round__(2)
         waxpeer_cookie = str(request.form.get('waxpeer_cookie')).strip()
 
         if not (bool(suggested_rate) and bool(shadow_user_token) and bool(shadow_merchant_token) and bool(waxpeer_token)
-                and bool(csgo_market_token) and bool(shadowpay_discount) and bool(waxpeer_discount) and bool(
-                    waxpeer_cookie)):
+                and bool(csgo_market_token) and bool(shadowpay_discount) and bool(waxpeer_discount)
+                and bool(waxpeer_cookie)) and bool(csgo_empire_token) and bool(buff_rate):
             return jsonify({"status": "error", "details": "You should fill the form fully!"})
         else:
             if not current_user.configs:
                 new_config = Config(suggested_rate=suggested_rate, shadow_user_token=shadow_user_token,
                                     shadow_merchant_token=shadow_merchant_token, waxpeer_token=waxpeer_token,
-                                    csgo_market_token=csgo_market_token, shadowpay_discount=shadowpay_discount,
+                                    csgo_market_token=csgo_market_token, csgo_empire_token=csgo_empire_token,
+                                    buff_rate=buff_rate, shadowpay_discount=shadowpay_discount,
                                     waxpeer_discount=waxpeer_discount, market_discount=market_discount,
                                     waxpeer_cookie=waxpeer_cookie, user_id=current_user.id)
                 db.session.add(new_config)
@@ -71,6 +75,8 @@ def configs():
                          shadow_merchant_token=shadow_merchant_token,
                          waxpeer_token=waxpeer_token,
                          csgo_market_token=csgo_market_token,
+                         csgo_empire_token=csgo_empire_token,
+                         buff_rate=buff_rate,
                          shadowpay_discount=shadowpay_discount,
                          waxpeer_discount=waxpeer_discount, market_discount=market_discount,
                          waxpeer_cookie=waxpeer_cookie, user_id=current_user.id))
@@ -147,6 +153,28 @@ def items():
                 flash('Could not fetch user inventory. Please try again in 2 minutes.', category='error')
                 return redirect(url_for('views.home'))
 
+
+@views.route('/auction', methods=['GET'])
+@login_required
+def empire_auction():
+    if request.method == 'GET':
+        if not current_user.configs:
+            return redirect(url_for('views.configs'))
+        else:
+            csgo_empire_token = current_user.configs[0].csgo_empire_token
+            shadow_token = current_user.configs[0].shadow_user_token
+            csgo_market_token = current_user.configs[0].csgo_market_token
+            buff_rate = current_user.configs[0].buff_rate
+            result = asyncio.run(get_all_auction_data(csgo_empire_token=csgo_empire_token, shadow_token=shadow_token,
+                                                      market_token=csgo_market_token, buff_rate=buff_rate))
+            if result[0]["status"] == "success":
+                flash('Successfully Loaded All Items!', category='success')
+                return render_template("auction.html", current_auctions=result[0], empire_market_data=result[1],
+                                       steam_inventories=result[2], shadowpay_market_data=result[3],
+                                       csgo_market_data=result[4], buff=result[5], socket_info=result[6])
+            else:
+                flash('Could not fetch user inventory. Please try again in 2 minutes.', category='error')
+                return redirect(url_for('views.home'))
 
 @views.route('/update-item', methods=['PATCH'])
 @login_required

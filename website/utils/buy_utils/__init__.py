@@ -1,13 +1,12 @@
+import requests
 from .google_sheet import GoogleSheet
 from .empire import Empire
 import asyncio
 
 from ..sell_utils import Shadow, CsgoMarket
 
-BUFF_RATE = 1.01
 
-
-async def get_all_auction_data(csgo_empire_token, shadow_token, market_token):
+async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, buff_rate):
     all_items_data = {
         "items": [],
         "ids": [],
@@ -37,6 +36,7 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token):
     shadowpay_market_data = shadowpay_market_data.result()
     csgo_market_data = csgo_market_data.result()
     buff = buff.result()
+    socket_info = csgo_empire.get_user_socket_info()
 
     for item, values in current_auctions.items():
         if item not in steam_inventories:
@@ -61,14 +61,14 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token):
 
                     """Buff Listing Check"""
                     buff_listing = buff[item]["listing"]
-                    discount = (float(1 - (price * 0.614) / (buff_listing * BUFF_RATE)) * 100).__round__(2)
+                    discount = (float(1 - (price * 0.614) / (buff_listing * buff_rate)) * 100).__round__(2)
                     if discount >= 4:
                         buff_buy_order = buff[item]["buy_order"]
                         if buff_buy_order != 0:
                             buy_order_discount = (float(
-                                1 - (price * 0.614) / (buff_buy_order * BUFF_RATE)) * 100).__round__(2)
+                                1 - (price * 0.614) / (buff_buy_order * buff_rate)) * 100).__round__(2)
                         else:
-                            buy_order_discount = "NA"
+                            buy_order_discount = "N/A"
 
                         if item in shadowpay_market_data:
                             shadowpay_cheapest_rate = float(shadowpay_market_data[item]["price"] /
@@ -103,4 +103,9 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token):
                              "csgo_market_cheapest_rate": csgo_market_cheapest_rate
                              }
                         )
-    return all_items_data
+                        all_items_data["ids"].append(item_id)
+
+        all_items_data["status"] = "success"
+
+    return all_items_data, empire_market_data, steam_inventories, shadowpay_market_data, csgo_market_data, buff, \
+           socket_info

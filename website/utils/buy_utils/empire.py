@@ -68,6 +68,9 @@ class Empire:
 
         return self._auction_dict
 
+    def get_user_socket_info(self):
+        return requests.get("https://csgoempire.com/api/v2/metadata/socket", headers=self.__headers).json()
+
     def get_market_dict(self):
         return self._market_dict
 

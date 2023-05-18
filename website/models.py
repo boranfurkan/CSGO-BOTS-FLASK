@@ -19,9 +19,11 @@ class Config(db.Model):
     shadow_merchant_token = db.Column(db.String(150))
     waxpeer_token = db.Column(db.String(150))
     csgo_market_token = db.Column(db.String(150))
+    csgo_empire_token = db.Column(db.String(150))
     shadowpay_discount = db.Column(db.Integer)
     waxpeer_discount = db.Column(db.Integer)
     market_discount = db.Column(db.Integer)
+    buff_rate = db.Column(db.Integer)
     waxpeer_cookie = db.Column(db.String(5000))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 

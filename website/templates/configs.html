@@ -70,8 +70,6 @@ content %}
                 {% endif %}
         />
       </div>
-  </div>
-  <div class="right-form">
       <div class="form-group">
         <label for="csgo_market_token">Csgo Market Token</label>
         <input
@@ -83,6 +81,40 @@ content %}
           placeholder="Enter csgo market user token"
           value={% if user.configs %}
                 {{ user.configs[0].csgo_market_token }}
+                {% else %}
+                ""
+                {% endif %}
+        />
+      </div>
+  </div>
+  <div class="right-form">
+      <div class="form-group">
+        <label for="csgo_empire_token">Csgo Empire Token</label>
+        <input
+          required
+          type="text"
+          class="form-control"
+          id="csgo_empire_token"
+          name="csgo_empire_token"
+          placeholder="Enter csgo empire user token"
+          value={% if user.configs %}
+                {{ user.configs[0].csgo_empire_token }}
+                {% else %}
+                ""
+                {% endif %}
+        />
+      </div>
+      <div class="form-group">
+        <label for="buff_rate">Buff Rmb Buy Rate</label>
+        <input
+          required
+          type="text"
+          class="form-control"
+          id="buff_rate"
+          name="buff_rate"
+          placeholder="Enter buff rmb buy rate"
+          value={% if user.configs %}
+                {{ user.configs[0].buff_rate }}
                 {% else %}
                 ""
                 {% endif %}
