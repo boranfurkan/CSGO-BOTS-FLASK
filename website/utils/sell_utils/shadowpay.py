@@ -7,6 +7,10 @@ class Shadow:
         self.user_token = user_token
         self.merchant_token = merchant_token
         self.discount = discount
+
+        self.volume_dict = {}
+        self.suggested_prices_dict = {}
+
         self._inventory = {}
         self.__links_array = []
         self.__market_data = {}
@@ -23,7 +27,7 @@ class Shadow:
             "Authorization": f"Bearer {self.merchant_token}"
         }
 
-    def get_inventory(self, user_items):
+    async def get_inventory(self, user_items, is_for_sale: bool):
         request_shadow = requests.get("https://api.shadowpay.com/api/v2/user/offers?limit=999",
                                       headers=self.__user_headers).json()
 
@@ -31,15 +35,25 @@ class Shadow:
             item_id = item["id"]
             item_name = item["steam_item"]["steam_market_hash_name"]
             current_price = float((item["price"])).__round__(2)
-            if item_name in user_items:
-                suggested_price = user_items[item_name]
+            image = item["steam_item"]["icon"]
+            if is_for_sale:
+                if item_name in user_items:
+                    suggested_price = user_items[item_name]
+                    self._inventory[item_name] = {}
+                    self._inventory[item_name]["id"] = item_id
+                    self._inventory[item_name]["suggested_price"] = suggested_price
+                    self._inventory[item_name]["price"] = current_price
+                    self._inventory[item_name]["image"] = image
+                    self.__history[item_id] = current_price
+                else:
+                    print(f"Please add {item_name} into special items. There is no buff data found!")
+            else:
                 self._inventory[item_name] = {}
                 self._inventory[item_name]["id"] = item_id
-                self._inventory[item_name]["suggested_price"] = suggested_price
+                self._inventory[item_name]["suggested_price"] = item["steam_item"]["suggested_price"]
                 self._inventory[item_name]["price"] = current_price
+                self._inventory[item_name]["image"] = image
                 self.__history[item_id] = current_price
-            else:
-                print(f"Please add {item_name} into special items. There is no buff data found!")
 
         total_items = int(request_shadow["metadata"]["total"])
         if total_items > 100:
@@ -53,15 +67,25 @@ class Shadow:
                     item_id = item["id"]
                     item_name = item["steam_item"]["steam_market_hash_name"]
                     current_price = float((item["price"])).__round__(2)
-                    if item_name in user_items:
-                        suggested_price = user_items[item_name]
+                    image = item["steam_item"]["icon"]
+                    if is_for_sale:
+                        if item_name in user_items:
+                            suggested_price = user_items[item_name]
+                            self._inventory[item_name] = {}
+                            self._inventory[item_name]["id"] = item_id
+                            self._inventory[item_name]["suggested_price"] = suggested_price
+                            self._inventory[item_name]["price"] = current_price
+                            self._inventory[item_name]["image"] = image
+                            self.__history[item_id] = current_price
+                        else:
+                            print(f"Please add {item_name} into special items. There is no buff data found!")
+                    else:
                         self._inventory[item_name] = {}
                         self._inventory[item_name]["id"] = item_id
-                        self._inventory[item_name]["suggested_price"] = suggested_price
+                        self._inventory[item_name]["suggested_price"] = item["steam_item"]["suggested_price"]
                         self._inventory[item_name]["price"] = current_price
+                        self._inventory[item_name]["image"] = image
                         self.__history[item_id] = current_price
-                    else:
-                        print(f"Please add {item_name} into special items. There is no buff data found!")
                 offset += 100
         return self._inventory
 
@@ -138,6 +162,33 @@ class Shadow:
             for item in response["updated_items"]:
                 self.__logs.append(f"{item['steam_item']['steam_market_hash_name']} is updated to: {item['price']}")
         return self.get_logs()
+
+    async def get_items_volume(self):
+        response = requests.get(f"https://api.shadowpay.com/api/v2/user/items/prices?token={self.user_token}").json()
+        for item in response["data"]:
+            item_name = item["steam_market_hash_name"]
+            item_price = float(item["price"])
+            item_count = int(item["volume"])
+
+            self.volume_dict[item_name] = {}
+            self.volume_dict[item_name]["price"] = item_price
+            self.volume_dict[item_name]["count"] = item_count
+        return self.volume_dict
+
+    async def get_suggested_prices(self):
+        response = requests.get(f"https://api.shadowpay.com/api/v2/user/items/steam?token={self.user_token}").json()
+        for item in response["data"]:
+            item_name = item["steam_market_hash_name"]
+            price = float(item["suggested_price"])
+            if price > 35:
+                if item_name[:7] != "Sticker":
+                    self.suggested_prices_dict[item_name] = price
+
+    def get_suggested_prices_dict(self):
+        return self.suggested_prices_dict
+
+    def set_suggested_prices_dict(self, new_dict: dict):
+        self.suggested_prices_dict = new_dict
 
     def set_items_to_update(self, new_array: list):
         self.__items_to_update["offers"] = new_array

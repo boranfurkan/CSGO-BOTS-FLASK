@@ -1,12 +1,13 @@
+import asyncio
 import time
 from threading import Thread
 
 from flask_login import current_user
 from flask_socketio import SocketIO, emit
 
-from website.utils.shadowpay import Shadow
-from website.utils.waxpeer import Waxpeer
-from website.utils.csgo_market import CsgoMarket
+from website.utils.sell_utils.shadowpay import Shadow
+from website.utils.sell_utils.waxpeer import Waxpeer
+from website.utils.sell_utils.csgo_market import CsgoMarket
 
 from .models import Config, Item
 
@@ -58,7 +59,7 @@ def handle_shadowpay(message):
         for item in items:
             all_user_items[item.name] = item.suggested_price
 
-        shadowpay.get_inventory(user_items=all_user_items)
+        asyncio.run(shadowpay.get_inventory(user_items=all_user_items, is_for_sale=True))
 
         shadowpay_thread.start()
         socketio.emit("shadowpay", "Bot is successfully started!")
@@ -104,7 +105,7 @@ def handle_waxpeer(message):
         for item in items:
             all_user_items[item.name] = item.suggested_price
 
-        waxpeer.get_inventory(user_items=all_user_items)
+        asyncio.run(waxpeer.get_inventory(user_items=all_user_items, is_for_sale=True))
 
         waxpeer_thread.start()
 
@@ -151,7 +152,7 @@ def handle_csgo_market(message):
         for item in items:
             all_user_items[item.name] = item.suggested_price
 
-        csgo_market.get_inventory(user_items=all_user_items)
+        asyncio.run(csgo_market.get_inventory(user_items=all_user_items, is_for_sale=True))
 
         csgo_market_thread.start()
         socketio.emit("csgo_market", "Bot is successfully started!")

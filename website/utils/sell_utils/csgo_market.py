@@ -8,6 +8,8 @@ class CsgoMarket:
         self.key = secret_key
         self.discount = discount
 
+        self.volume_dict = {}
+
         self._inventory = {}
         self.__links_array = []
         self.__market_data = {}
@@ -18,23 +20,32 @@ class CsgoMarket:
             "Content-Type": "application/json",
         }
 
-    def get_inventory(self, user_items):
+    async def get_inventory(self, user_items, is_for_sale: bool):
         response = requests.get(f"https://market.csgo.com/api/v2/items?key={self.key}",
                                 headers=self.__user_headers).json()
 
         for item in response["items"]:
             item_name = item["market_hash_name"]
-            if item_name in user_items:
+            if is_for_sale:
+                if item_name in user_items:
+                    item_id = item["item_id"]
+                    current_price = item["price"] * 1000
+                    suggested_price = user_items[item_name] * 1000
+                    self._inventory[item_name] = {}
+                    self._inventory[item_name]["id"] = item_id
+                    self._inventory[item_name]["suggested_price"] = suggested_price
+                    self._inventory[item_name]["price"] = current_price
+                    self.__history[item_id] = {"name": item_name, "price": current_price}
+                else:
+                    print(f"Please add {item_name} into special items. There is no buff data found!")
+            else:
                 item_id = item["item_id"]
                 current_price = item["price"] * 1000
-                suggested_price = user_items[item_name] * 1000
                 self._inventory[item_name] = {}
                 self._inventory[item_name]["id"] = item_id
-                self._inventory[item_name]["suggested_price"] = suggested_price
+                self._inventory[item_name]["suggested_price"] = current_price
                 self._inventory[item_name]["price"] = current_price
                 self.__history[item_id] = {"name": item_name, "price": current_price}
-            else:
-                print(f"Please add {item_name} into special items. There is no buff data found!")
         return self._inventory
 
     def create_links(self):
@@ -114,6 +125,24 @@ class CsgoMarket:
             self.__logs.append(f"{item_name} is updated to: {item_price}, {response}")
 
         return self.get_logs()
+
+    async def get_items_volume(self):
+        response = requests.get("https://market.csgo.com/api/v2/prices/USD.json").json()
+        for item in response["items"]:
+            item_name = item["market_hash_name"]
+            item_count = int(item["volume"])
+            item_price = float(item["price"]).__round__(2)
+
+            self.volume_dict[item_name] = {}
+            self.volume_dict[item_name]["price"] = item_price
+            self.volume_dict[item_name]["count"] = item_count
+        return self.volume_dict
+
+    def get_volume_dict(self):
+        return self.volume_dict
+
+    def set_volume_dict(self, new_dict: dict):
+        self.volume_dict = new_dict
 
     def make_user_online(self):
         response = requests.get(f"https://market.csgo.com/api/v2/ping?key={self.key}").text

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from website.utils.api_utils import get_user_items
+from website.utils.sell_utils import get_user_items
 from .models import Config, Item, BotStatus
 from website.logger.logger import logger
 from website.db.db import db
@@ -64,8 +64,6 @@ def configs():
                     for item in all_user_items:
                         if item.is_special_priced != 1 or item.is_special_priced != True:
                             item.suggested_price = float(item.buff_listing_7 * suggested_rate).__round__(2)
-                    return jsonify({"status": "success", "details": "Successfully updated the item prices according "
-                                                                    "to new current_rate!"})
 
                 Config.query.filter_by(
                     user_id=current_user.id).update(
@@ -77,6 +75,7 @@ def configs():
                          waxpeer_discount=waxpeer_discount, market_discount=market_discount,
                          waxpeer_cookie=waxpeer_cookie, user_id=current_user.id))
                 db.session.commit()
+                flash('Successfully updated the item prices according to new suggested rate!', category='success')
                 return jsonify({"status": "success", "details": "Successfully updated the configs!"})
 
     elif request.method == "GET":
@@ -170,6 +169,7 @@ def update_item():
 
 
 @views.route('/update-bot-status', methods=['POST'])
+@login_required
 def update_bot_status():
     if request.method == "POST":
         try:

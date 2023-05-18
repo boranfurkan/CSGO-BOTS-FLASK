@@ -26,27 +26,40 @@ class Waxpeer:
             'sec-ch-ua-mobile': '?0',
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-site',
-            'token': 'null',
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+            'sec-fetch-site': 'same-site'
         }
 
-    def get_inventory(self, user_items):
+    async def get_inventory(self, user_items, is_for_sale: bool):
         response = requests.get(f"https://api.waxpeer.com/v1/list-items-steam?api={self.token}").json()
 
         for item in response["items"]:
             item_name = item["name"]
-            if item_name in user_items:
+            if is_for_sale:
+                if item_name in user_items:
+                    item_id = item["item_id"]
+                    current_price = item["price"]
+                    image = item["steam_price"]["img"]
+                    suggested_price = user_items[item_name] * 1000
+                    self._inventory[item_name] = {}
+                    self._inventory[item_name]["id"] = item_id
+                    self._inventory[item_name]["suggested_price"] = suggested_price
+                    self._inventory[item_name]["price"] = current_price
+                    self._inventory[item_name]["image"] = image
+                    self.__history[item_id] = {"name": item_name, "price": current_price}
+                else:
+                    print(f"Please add {item_name} into special items. There is no buff data found!")
+            else:
                 item_id = item["item_id"]
                 current_price = item["price"]
-                suggested_price = user_items[item_name] * 1000
+                image = item["steam_price"]["img"]
+                suggested_price = item["steam_price"]["average"]
                 self._inventory[item_name] = {}
                 self._inventory[item_name]["id"] = item_id
                 self._inventory[item_name]["suggested_price"] = suggested_price
                 self._inventory[item_name]["price"] = current_price
+                self._inventory[item_name]["image"] = image
                 self.__history[item_id] = {"name": item_name, "price": current_price}
-            else:
-                print(f"Please add {item_name} into special items. There is no buff data found!")
+
         return self._inventory
 
     def request_market_data(self):
