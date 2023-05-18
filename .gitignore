@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 website/utils/buy_utils/buff_keys.json
+.idea
