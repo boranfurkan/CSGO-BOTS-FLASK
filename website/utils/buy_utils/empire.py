@@ -40,9 +40,14 @@ class Empire:
 
     async def get_auction_items(self):
         response = requests.get(
-            f"https://csgoempire.com/api/v2/trading/items?per_page=2500&page=1&price_min=4000&"
-            f"price_max=400000&price_max_above=999&sort=desc&order=market_value&auction=yes",
-            headers=self.__headers).json()
+            f"https://csgoempire.com/api/v2/trading/items?per_page=2000&page=1&price_min=4000&"
+            f"price_max=400000&price_max_above=999&auction=yes",
+            headers=self.__headers)
+
+        if response.status_code == 200:
+            response = response.json()
+        else:
+            print(response.text)
 
         for item in response["data"]:
             item_name = item["market_name"]
@@ -67,9 +72,6 @@ class Empire:
                 self._auction_dict[item_name]["end_time"] = item_end_time
 
         return self._auction_dict
-
-    def get_user_socket_info(self):
-        return requests.get("https://csgoempire.com/api/v2/metadata/socket", headers=self.__headers).json()
 
     def get_market_dict(self):
         return self._market_dict

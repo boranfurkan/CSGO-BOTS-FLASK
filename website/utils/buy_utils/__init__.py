@@ -1,8 +1,6 @@
-import requests
 from .google_sheet import GoogleSheet
 from .empire import Empire
 import asyncio
-
 from ..sell_utils import Shadow, CsgoMarket
 
 
@@ -36,7 +34,6 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, bu
     shadowpay_market_data = shadowpay_market_data.result()
     csgo_market_data = csgo_market_data.result()
     buff = buff.result()
-    socket_info = csgo_empire.get_user_socket_info()
 
     for item, values in current_auctions.items():
         if item not in steam_inventories:
@@ -94,7 +91,7 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, bu
                              "url": item_image_url,
                              "auction_ends": auction_ends,
                              "current_price": price,
-                             "is_cheaper_in_market": str(is_cheaper_in_market).upper(),
+                             "is_cheaper_in_market": is_cheaper_in_market,
                              "discount": discount,
                              "buy_order_discount": buy_order_discount,
                              "shadowpay_count": shadowpay_count,
@@ -107,5 +104,14 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, bu
 
         all_items_data["status"] = "success"
 
-    return all_items_data, empire_market_data, steam_inventories, shadowpay_market_data, csgo_market_data, buff, \
-           socket_info
+    return all_items_data, empire_market_data, steam_inventories, shadowpay_market_data, csgo_market_data, buff
+
+
+def update_auction_data(token):
+    try:
+        csgo_empire = Empire(token)
+        new_auctions = asyncio.run(csgo_empire.get_auction_items())
+        return new_auctions, "success"
+
+    except Exception as error:
+        return str(error), "error"

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Items{% endblock %}
+{% block content %}
+
+<div id="card-container" class="card-group"></div>
+<script>
+
+  $(document).ready(function() {
+      const empireMarketData = {{ empire_market_data | tojson | safe }}
+      const steamInventories = {{ steam_inventories | tojson | safe }}
+      const shadowpayMarketData = {{ shadowpay_market_data | tojson | safe }}
+      const csgoMarketData = {{ csgo_market_data | tojson | safe }}
+      const buffData = {{ buff | tojson | safe }}
+      const buffRate = {{ buff_rate | tojson | safe }}
+
+      const currentAuctions = {{ current_auctions | tojson | safe }}
+      currentAuctions.items.forEach(function(item) {
+          const itemId = item.id;
+          const auctionEnds = item.auction_ends;
+          const imageUrl = "https://community.cloudflare.steamstatic.com/economy/image/" + item.url;
+          const itemName = item.name;
+          const currentPrice = item.current_price;
+          const isCheaperInMarket = item.is_cheaper_in_market;
+          const discount = item.discount;
+          const shadowRate = item.shadowpay_cheapest_rate;
+          const shadowCount = item.shadowpay_count;
+          const csgoMarketRate = item.csgo_market_cheapest_rate;
+          const csgoMarketCount = item.csgo_market_count;
+          const linkUrl = `https://csgoempire.com/item/${item.id}`
+          const linkText = "More Info"
+
+          createCard(itemId, "", imageUrl, itemName, currentPrice, isCheaperInMarket, discount, shadowRate, shadowCount,
+              csgoMarketRate, csgoMarketCount, linkUrl, linkText)
+          startTimer(itemId, auctionEnds)
+      });
+      setInterval(checkNewItems, 3000, empireMarketData, steamInventories, buffData, shadowpayMarketData, csgoMarketData, buffRate);
+})
+</script>
+
+<script src="{{ url_for('static', filename='js/auction.js') }}"></script>
+{% endblock %}

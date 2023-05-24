@@ -180,7 +180,6 @@ input:focus, .form-control:focus {
     border: 1px solid #fab007;
     padding-left: 5px;
     border-radius: 3px;
-
 }
 
 .login-form{
@@ -193,4 +192,96 @@ input:focus, .form-control:focus {
 .login-form > form{
     margin-top: 1%;
     width: 50%;
+}
+
+
+.info-divs{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.7rem;
+}
+
+.info-divs > p {
+    margin-bottom: 0;
+}
+
+.card-group{
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-card{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
+    border: 2px solid #fab007;
+    border-radius: 0.25rem;
+    background: transparent!important;
+    margin: 1%;
+    padding: 1%;
+    width: 14vw!important;
+}
+
+.cheaper-in-market {
+    border: 2px solid #fa0707;
+}
+
+.card-title{
+    margin-bottom: 3.5rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.card-footer{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.redirect-button{
+    width: 100%;
+    text-align: center;
+}
+
+.price-div{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.price-div > p {
+    margin-bottom: 0;
+}
+
+.price-div > img {
+    margin-right: 3px;
+    width: 1rem;
+}
+
+.discount{
+    margin-bottom: 0;
+}
+
+.icons{
+    width: 1rem;
+}
+
+.market-icon{
+    width: 1.1rem;
+}
+
+.count-divs{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.1rem;
+}
+
+.count-divs > p {
+    margin-bottom: 0;
+    margin-right: 2px;
 }
