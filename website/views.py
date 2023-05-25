@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, Response
 from website.utils.buy_utils import get_all_auction_data, update_auction_data
 from flask_login import login_required, current_user
 from website.utils.sell_utils import get_user_items
@@ -7,6 +7,7 @@ from website.logger.logger import logger
 from website.db.db import db
 import asyncio
 import json
+import time
 
 views = Blueprint('views', __name__)
 
@@ -177,16 +178,24 @@ def empire_auction():
                 return redirect(url_for('views.home'))
 
 
-@views.route('/get-new-auctions', methods=['GET'])
+@views.route('/get-new-auctions')
+@login_required
 def get_new_auctions():
-    if request.method == 'GET':
-        csgo_empire_token = current_user.configs[0].csgo_empire_token
-        new_auctions = update_auction_data(csgo_empire_token)
+    csgo_empire_token = current_user.configs[0].csgo_empire_token
 
-        if new_auctions[1] == "success":
-            return jsonify({"status": "success", "data": new_auctions[0]})
-        else:
-            return jsonify({"status": "error", "details": new_auctions[0]})
+    def get_items():
+        while True:
+            new_auctions = update_auction_data(csgo_empire_token)
+
+            if new_auctions[1] == "success":
+                yield f"data: {json.dumps(new_auctions[0])}\n\n"
+            else:
+                yield f"data: Error {json.dumps(new_auctions[0])}\n\n"
+                time.sleep(60)
+
+            time.sleep(3)
+
+    return Response(get_items(), mimetype='text/event-stream')
 
 
 @views.route('/update-item', methods=['PATCH'])

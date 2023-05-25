@@ -2,6 +2,15 @@
 {% block title %}Items{% endblock %}
 {% block content %}
 
+<div class="search-group">
+  <div class="form-outline">
+    <input type="search" id="item-search" class="form-control" placeholder="Search"/>
+  </div>
+  <button type="button" class="btn btn-primary auction-search">
+    <i class="fas fa-search"></i>
+  </button>
+</div>
+
 <div id="card-container" class="card-group"></div>
 <script>
 
@@ -33,7 +42,7 @@
               csgoMarketRate, csgoMarketCount, linkUrl, linkText)
           startTimer(itemId, auctionEnds)
       });
-      setInterval(checkNewItems, 3000, empireMarketData, steamInventories, buffData, shadowpayMarketData, csgoMarketData, buffRate);
+      checkNewItems(empireMarketData, steamInventories, buffData, shadowpayMarketData, csgoMarketData, buffRate);
 })
 </script>
 

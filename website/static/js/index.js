@@ -49,6 +49,9 @@ function checkActivePage(){
   case "/":
     $("#home")[0].classList.add("active")
     break;
+  case "/auction":
+  $("#auction")[0].classList.add("active")
+    break;
   case "/items":
     $("#items")[0].classList.add("active")
     break;

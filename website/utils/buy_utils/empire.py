@@ -46,8 +46,8 @@ class Empire:
 
         if response.status_code == 200:
             response = response.json()
-        else:
-            print(response.text)
+        elif response.status_code == 429:
+            print("gg")
 
         for item in response["data"]:
             item_name = item["market_name"]
