@@ -115,3 +115,7 @@ def update_auction_data(token):
 
     except Exception as error:
         return str(error), "error"
+
+
+def buff_buy_data():
+    pass
