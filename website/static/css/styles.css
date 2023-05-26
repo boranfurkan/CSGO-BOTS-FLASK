@@ -232,6 +232,20 @@ input:focus, .form-control:focus {
     border: 2px solid #fa0707;
 }
 
+.redirect-button-red{
+    background-color: #fa0707;
+    border-color: #980404;
+}
+
+.redirect-button-pink{
+    background-color: #cd07fa;
+    border-color: #520267;
+}
+
+.special-item {
+    border: 2px solid #cd07fa;
+}
+
 .card-title{
     margin-bottom: 3.5rem;
     margin-top: 1rem;

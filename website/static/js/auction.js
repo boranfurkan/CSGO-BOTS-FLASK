@@ -29,8 +29,16 @@ function createCard(id, endTime, imageUrl, titleText, price, isCheaperInMarket, 
   // Set element classes as per bootstrap
   if(isCheaperInMarket) {
       card.className = 'text-white item-card gradient-border cheaper-in-market';
+      cardLink.className = 'btn btn-primary redirect-button redirect-button-red';
   }else{
-      card.className = 'text-white item-card gradient-border';
+      if ( Math.floor(itemDiscount) > 12){
+          card.className = 'text-white item-card gradient-border special-item';
+          cardLink.className = 'btn btn-primary redirect-button redirect-button-pink';
+      }
+      else {
+           card.className = 'text-white item-card gradient-border';
+           cardLink.className = 'btn btn-primary redirect-button redirect-button';
+      }
   }
 
   card.id = `itemCard-${id}`
@@ -46,7 +54,6 @@ function createCard(id, endTime, imageUrl, titleText, price, isCheaperInMarket, 
   cardBody.className = 'card-body';
   cardTitle.className = 'card-title';
   cardTitle.style.height = "3rem"
-  cardLink.className = 'btn btn-primary redirect-button';
   currentPrice.id = `price-${itemId}`;
   priceDiv.classList.add('price-div');
   discount.classList.add('discount');
