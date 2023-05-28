@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, Response
-from website.utils.buy_utils import get_all_auction_data, update_auction_data
+from website.utils.buy_utils import get_all_auction_data, update_auction_data, buff_buy_data
 from flask_login import login_required, current_user
 from website.utils.sell_utils import get_user_items
 from .models import Config, Item, BotStatus
@@ -174,7 +174,28 @@ def empire_auction():
                                        csgo_market_data=result[4], buff=result[5],
                                        buff_rate=buff_rate, user=current_user)
             else:
-                flash('Could not fetch user inventory. Please try again in 2 minutes.', category='error')
+                flash('Could not fetch auction data. Please try again in 60 seconds.', category='error')
+                return redirect(url_for('views.home'))
+
+
+@views.route('/buff-buy', methods=['GET'])
+@login_required
+def buff_buy():
+    if request.method == 'GET':
+        if not current_user.configs:
+            return redirect(url_for('views.configs'))
+        else:
+            csgo_empire_token = current_user.configs[0].csgo_empire_token
+            shadow_token = current_user.configs[0].shadow_user_token
+            csgo_market_token = current_user.configs[0].csgo_market_token
+            buff_rate = current_user.configs[0].buff_rate
+            result = asyncio.run(buff_buy_data(csgo_empire_token=csgo_empire_token, shadow_token=shadow_token,
+                                               market_token=csgo_market_token, buff_rate=buff_rate))
+            if result["status"] == "success":
+                flash('Successfully Loaded All Items!', category='success')
+                return render_template("buff_buy.html", buff_data=result["items"], user=current_user)
+            else:
+                flash('Could not fetch buff data. Please try again in 60 seconds.', category='error')
                 return redirect(url_for('views.home'))
 
 
