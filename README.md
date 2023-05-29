@@ -17,52 +17,44 @@ The application requires the following to be installed:
 
 1. Clone this repository.
 
-\`\`\`bash
+```bash
 git clone <repo-url>
-\`\`\`
+```
 
 2. Change into the directory.
 
-\`\`\`bash
+```bash
 cd <repo-directory>
-\`\`\`
+```
 
 3. Create a Python virtual environment and activate it.
 
-\`\`\`bash
+```bash
 python3 -m venv venv
 source venv/bin/activate
-\`\`\`
+```
 
 4. Install the required packages.
 
-\`\`\`bash
+```bash
 pip install -r requirements.txt
-\`\`\`
+```
 
 5. Set the FLASK_APP environment variable.
 
-\`\`\`bash
+```bash
 export FLASK_APP=main.py
-\`\`\`
+```
 
 6. Run the application.
 
-\`\`\`bash
+```bash
 flask run
-\`\`\`
+```
 
 ## Usage
-
 The application provides interfaces to Shadowpay, Waxpeer, and CSGO Market platforms. Users can start or stop each bot separately, and view logs of bot activities.
 
-\`\`\`python
-# Start or stop a bot
-socketio.emit("<platform>", "start")
-socketio.emit("<platform>", "stop")
-
-# Replace "<platform>" with either "shadowpay", "waxpeer", or "csgo_market"
-\`\`\`
 
 ## Built With
 
