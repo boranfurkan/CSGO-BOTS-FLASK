@@ -1,22 +1,30 @@
+# Import necessary libraries
 import json
 import gspread
 import os
 
+# Specify the directory and file name of the 'buff_keys.json' file
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, 'buff_keys.json')
 
 
 class GoogleSheet:
     def __init__(self):
+        # Initialize Google Sheets API with service account credentials from 'buff_keys.json'
         self.service_account = gspread.service_account(filename=filename)
+        # Specify the name of the Google Sheet
         self.sheet = "Buff Data"
+        # Initialize dictionaries for storing data from Buff, Steam, and Item Histories
         self._buff_dict = {}
         self._steam_dict = {}
         self._history_dict = {}
 
+    # This method fetches Buff items from the first sheet of your Google Sheet
     async def get_buff_items(self):
+        # Opening the Google Sheet and selecting the first worksheet
         sheet = self.service_account.open(self.sheet)
         worksheet = sheet.worksheet("Sheet1")
+        # Fetching all data records from the first sheet and storing relevant information in _buff_dict
         buff_data = worksheet.get_all_records()
         for item_buff in buff_data:
             item_name = item_buff["ITEM"]
@@ -34,10 +42,14 @@ class GoogleSheet:
             self._buff_dict[item_name]["listing60"] = item_listing60
         return self._buff_dict
 
+    # This method fetches Steam inventory data from the second sheet of your Google Sheet
     async def get_steam_inventories(self):
+        # Opening the Google Sheet and selecting the second worksheet
         sheet = self.service_account.open(self.sheet)
         worksheet = sheet.worksheet("Sheet2")
         users = worksheet.row_values(1)
+        # Fetching all user data and their respective items from the second sheet
+        # and storing them in _steam_dict
         for idx, user in enumerate(users):
             items_of_user = worksheet.col_values(idx + 1)
             for item_name in items_of_user[1:]:
@@ -45,11 +57,15 @@ class GoogleSheet:
 
         return self._steam_dict
 
+    # This method fetches Item History data from the third sheet of your Google Sheet
     async def get_item_histories(self):
+        # Opening the Google Sheet and selecting the third worksheet
         sheet = self.service_account.open(self.sheet)
         worksheet = sheet.worksheet("Sheet3")
         sell_history_data = worksheet.get_all_records()
 
+        # Fetching all sell history data from the third sheet
+        # and performing calculations to find average sell prices over 7, 14, and 30 days
         for item in sell_history_data:
             item_name = item["ITEM NAME"]
             item_shadowpay7 = json.loads(item["SHADOWPAY_7"])
@@ -107,14 +123,18 @@ class GoogleSheet:
 
         return self._history_dict
 
+    # Getter method for Buff data
     def get_buff_dict(self):
         return self._buff_dict
 
+    # Setter method to update Buff data
     def set_buff_dict(self, new_dict: dict):
         self._buff_dict = new_dict
 
+    # Getter method for Steam data
     def get_steam_dict(self):
         return self._steam_dict
 
+    # Setter method to update Steam data
     def set_steam_dict(self, new_dict: dict):
         self._steam_dict = new_dict

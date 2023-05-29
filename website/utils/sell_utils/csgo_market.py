@@ -2,9 +2,12 @@ import time
 import requests
 
 
+# Define the class for handling CSGO Market operations
 class CsgoMarket:
 
+    # Initialize the class with a secret_key and discount
     def __init__(self, secret_key, discount):
+        # Variables to store inventory, links, market data, history, items to update and logs
         self.key = secret_key
         self.discount = discount
 
@@ -20,6 +23,7 @@ class CsgoMarket:
             "Content-Type": "application/json",
         }
 
+    # Method to get inventory asynchronously from the CSGO Market API
     async def get_inventory(self, user_items, is_for_sale: bool):
         response = requests.get(f"https://market.csgo.com/api/v2/items?key={self.key}",
                                 headers=self.__user_headers).json()
@@ -48,6 +52,7 @@ class CsgoMarket:
                 self.__history[item_id] = {"name": item_name, "price": current_price}
         return self._inventory
 
+    # Method to create links for getting market data
     def create_links(self):
         url = f"https://market.csgo.com/api/v2/search-list-items-by-hash-name-all?key={self.key}"
         for k in range(0, len(self._inventory), 50):
@@ -58,6 +63,7 @@ class CsgoMarket:
             url = f"https://market.csgo.com/api/v2/search-list-items-by-hash-name-all?key={self.key}"
         return self.__links_array
 
+    # Method to request market data from the CSGO Market API
     def request_market_data(self):
         counter = 0
         for url in self.__links_array:
@@ -80,6 +86,7 @@ class CsgoMarket:
             self.__market_data[item].sort(key=lambda x: x["price"])
         return self.__market_data
 
+    # Method to update items based on the fetched market data
     def update_items(self):
         for item in self.__market_data:
             if len(self.__market_data[item]) == 1:
@@ -126,6 +133,7 @@ class CsgoMarket:
 
         return self.get_logs()
 
+    # Method to asynchronously get item volumes from the CSGO Market API
     async def get_items_volume(self):
         response = requests.get("https://market.csgo.com/api/v2/prices/USD.json").json()
         for item in response["items"]:
@@ -138,6 +146,7 @@ class CsgoMarket:
             self.volume_dict[item_name]["count"] = item_count
         return self.volume_dict
 
+    # Getters and setters for the volume_dict, items_to_update, links_array, market_data and logs variables
     def get_volume_dict(self):
         return self.volume_dict
 

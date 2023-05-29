@@ -256,5 +256,4 @@ searchField.addEventListener('keyup', function() {
         }
     });
 });
-
 })

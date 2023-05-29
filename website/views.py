@@ -1,3 +1,4 @@
+# Importing required modules and functions from Flask and other libraries
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, Response
 from website.utils.buy_utils import get_all_auction_data, update_auction_data, buff_buy_data
 from flask_login import login_required, current_user
@@ -9,9 +10,13 @@ import asyncio
 import json
 import time
 
+# Initializing a Flask Blueprint which allows you to organize your views
 views = Blueprint('views', __name__)
 
 
+# Route for the homepage. The @login_required decorator ensures that only logged in users can access this page.
+# If the current user has not set their configs or bot status, they are redirected to the appropriate page to do so.
+# Otherwise, it queries for the user's bot status and returns the home template with the user and bot status data.
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
@@ -31,6 +36,9 @@ def home():
             return render_template("home.html", user=current_user, user_bot_status=user_bot_status)
 
 
+# Route for the configs page. If the method is POST, it processes the form submission to set or update the user's
+# configs. If the method is GET, it checks if the user has set their configs and redirects them to the configs page
+# if they haven't.
 @views.route('/configs', methods=['GET', 'POST'])
 @login_required
 def configs():
@@ -91,6 +99,9 @@ def configs():
     return render_template("configs.html", user=current_user)
 
 
+# Route for the items page. If the method is GET and the user has set their configs, it gets the user's items
+# from the various platforms and saves or updates them in the database. The user is then shown the items page.
+# If the user has not set their configs, they are redirected to the configs page.
 @views.route('/items', methods=['GET', 'POST'])
 @login_required
 def items():
@@ -154,6 +165,9 @@ def items():
                 return redirect(url_for('views.home'))
 
 
+# Route for the auction page. If the method is GET and the user has set their configs, it gets the auction data
+# from the various platforms. The user is then shown the auction page. If the user has not set their configs,
+# they are redirected to the configs page.
 @views.route('/auction', methods=['GET'])
 @login_required
 def empire_auction():
@@ -178,6 +192,9 @@ def empire_auction():
                 return redirect(url_for('views.home'))
 
 
+# Route for the buff buy page. If the method is GET and the user has set their configs, it gets the buff buy data
+# from the various platforms. The user is then shown the buff buy page. If the user has not set their configs,
+# they are redirected to the configs page.
 @views.route('/buff-buy', methods=['GET'])
 @login_required
 def buff_buy():
@@ -199,6 +216,7 @@ def buff_buy():
                 return redirect(url_for('views.home'))
 
 
+# Route for getting new auctions. It continuously checks for new auctions and sends them to the client.
 @views.route('/get-new-auctions')
 @login_required
 def get_new_auctions():
@@ -219,6 +237,8 @@ def get_new_auctions():
     return Response(get_items(), mimetype='text/event-stream')
 
 
+# Route for updating an item. If the method is PATCH, it updates the suggested price of the item
+# and marks it as having a special price.
 @views.route('/update-item', methods=['PATCH'])
 @login_required
 def update_item():
@@ -239,6 +259,8 @@ def update_item():
             return jsonify({"status": "error", "details": error})
 
 
+# Route for updating the status of a bot. If the method is POST, it updates the status of the specified bot.
+# It also shows a flash message to the user depending on whether the bot was started, restarted, or stopped.
 @views.route('/update-bot-status', methods=['POST'])
 @login_required
 def update_bot_status():

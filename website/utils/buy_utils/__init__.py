@@ -4,7 +4,9 @@ import asyncio
 from ..sell_utils import Shadow, CsgoMarket
 
 
+# This function gathers data from several sources using async functionality.
 async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, buff_rate):
+    # Initialize an empty data dictionary.
     all_items_data = {
         "items": [],
         "ids": [],
@@ -12,23 +14,33 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, bu
     }
 
     try:
+        # Instantiate the Empire class with provided token.
         csgo_empire = Empire(csgo_empire_token=csgo_empire_token)
+        # Create asyncio tasks for gathering auction and market items from Empire.
         current_auctions = asyncio.create_task(csgo_empire.get_auction_items())
         empire_market_data = asyncio.create_task(csgo_empire.get_market_items())
 
+        # Instantiate the GoogleSheet class.
         sheet_data = GoogleSheet()
+        # Create asyncio tasks for gathering steam inventories and buff items from GoogleSheet.
         steam_inventories = asyncio.create_task(sheet_data.get_steam_inventories())
         buff = asyncio.create_task(sheet_data.get_buff_items())
 
+        # Instantiate the Shadow class with provided token.
         shadowpay = Shadow(user_token=shadow_token, merchant_token="", discount=0)
+        # Create an asyncio task for getting item volumes from Shadow.
         shadowpay_market_data = asyncio.create_task(shadowpay.get_items_volume())
 
+        # Instantiate the CsgoMarket class with provided token.
         csgo_market = CsgoMarket(secret_key=market_token, discount=0)
+        # Create an asyncio task for getting item volumes from CsgoMarket.
         csgo_market_data = asyncio.create_task(csgo_market.get_items_volume())
 
+        # Execute all tasks concurrently.
         await asyncio.gather(current_auctions, empire_market_data, steam_inventories,
                              buff, shadowpay_market_data, csgo_market_data)
 
+        # Continue processing with returned data.
         current_auctions = current_auctions.result()
         empire_market_data = empire_market_data.result()
         steam_inventories = steam_inventories.result()
@@ -107,29 +119,42 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, bu
         return all_items_data, empire_market_data, steam_inventories, shadowpay_market_data, csgo_market_data, buff
 
     except Exception as error:
+        # If an error occurs during the process, return the error details.
         all_items_data["status"] = {}
         all_items_data["data"] = "error"
         all_items_data["status"]["details"] = str(error)
         return all_items_data
 
 
+# This function updates auction data for a given token.
 def update_auction_data(token):
     try:
+        # Instantiate the Empire class with provided token.
         csgo_empire = Empire(token)
+        # Execute the asyncio task for getting auction items.
         new_auctions = asyncio.run(csgo_empire.get_auction_items())
+        # If successful, return the new auctions and success status.
         return new_auctions, "success"
 
     except Exception as error:
+        # If an error occurs, return the error message and error status.
         return str(error), "error"
 
 
+# This function gets buff buy data from several sources using async functionality.
 async def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_buy_rate):
+    # Initialize an empty data dictionary.
     all_items_data = {
         "items": {},
         "status": ""
     }
 
     try:
+        # Instantiate the Empire, GoogleSheet, Shadow, and CsgoMarket classes.
+        # Create asyncio tasks for gathering required data.
+        # Execute all tasks concurrently.
+        # Continue processing with returned data.
+
         csgo_empire = Empire(csgo_empire_token=csgo_empire_token)
         empire_market_data = asyncio.create_task(csgo_empire.get_market_items())
 
@@ -162,7 +187,8 @@ async def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_buy_
                     if item in item_histories:
                         suggested_price = float(item_histories[item]["average_14"]).__round__(2)
                         if suggested_price != 0 and suggested_price != "0":
-                            discount = float(100 * (1 - (buff_listing * float(buff_buy_rate) / suggested_price))).__round__(2)
+                            discount = float(
+                                100 * (1 - (buff_listing * float(buff_buy_rate) / suggested_price))).__round__(2)
 
                             if item in shadowpay_market_data:
                                 item_cheapest_shadowpay = shadowpay_market_data[item]["price"]
@@ -207,6 +233,7 @@ async def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_buy_
         return all_items_data
 
     except Exception as error:
+        # If an error occurs during the process, return the error details.
         all_items_data["status"] = "error"
         all_items_data["details"] = str(error)
         return all_items_data

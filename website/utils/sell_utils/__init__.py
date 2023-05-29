@@ -1,3 +1,4 @@
+# Import necessary modules and functions from other files
 from .shadowpay import Shadow
 from .waxpeer import Waxpeer
 from .csgo_market import CsgoMarket
@@ -6,12 +7,17 @@ from website.utils.common_functions import price_beautify
 import asyncio
 
 
+# The asynchronous function that gets user items from different sources
 async def get_user_items(shadow_token, waxpeer_token, csgo_market_token):
+    # Initialize a dictionary to store all items data and status
     all_items_data = {
         "items": {},
         "status": ""
     }
     try:
+        # Creating instances of Shadow, Waxpeer, and CsgoMarket classes using respective tokens,
+        # and creating asyncio tasks to get inventories from them
+
         shadowpay_instance = Shadow(user_token=shadow_token, merchant_token="", discount=0)
         shadowpay_instance = asyncio.create_task(shadowpay_instance.get_inventory(user_items={}, is_for_sale=False))
 
@@ -22,10 +28,16 @@ async def get_user_items(shadow_token, waxpeer_token, csgo_market_token):
         csgo_market_instance = asyncio.create_task(csgo_market_instance.get_inventory(user_items={}, is_for_sale=False))
 
         sheet_data = GoogleSheet()
+        # Creating an instance of GoogleSheet class and an asyncio task to get Buff items
         buff = asyncio.create_task(sheet_data.get_buff_items())
 
+        # Gather all tasks and await for their completion
         await asyncio.gather(shadowpay_instance, waxpeer_instance, csgo_market_instance, buff)
         buff = buff.result()
+
+        # Process the result of each task and store relevant information in all_items_data dictionary
+        # If an item is found in both the user's inventory (Shadow, Waxpeer, or CsgoMarket) and Buff data,
+        # it is stored with its price, listing, buy order, and image information.
         for item, values in shadowpay_instance.result().items():
             if item in buff:
                 all_items_data["items"][item] = {}
@@ -64,6 +76,8 @@ async def get_user_items(shadow_token, waxpeer_token, csgo_market_token):
                     all_items_data["items"][item]["listing60"] = buff[item]["listing60"]
                     all_items_data["items"][item]["csgo_market_price"] = price_beautify(int(values["price"]), 3)
 
+        # Ensure that all items in all_items_data have 'shadowpay_price', 'waxpeer_price', and 'csgo_market_price'
+        # fields. If any field is not present, it is set to 0.
         for item in all_items_data["items"]:
             if "shadowpay_price" not in all_items_data["items"][item].keys():
                 all_items_data["items"][item]["shadowpay_price"] = 0
@@ -72,9 +86,11 @@ async def get_user_items(shadow_token, waxpeer_token, csgo_market_token):
             if "csgo_market_price" not in all_items_data["items"][item].keys():
                 all_items_data["items"][item]["csgo_market_price"] = 0
 
+        # Update the status to "success"
         all_items_data["status"] = "success"
         return all_items_data
 
+    # Handle any exceptions and return the error as status
     except BaseException as error:
         all_items_data["status"] = error
         return all_items_data

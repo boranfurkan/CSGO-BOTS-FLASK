@@ -5,36 +5,47 @@ from threading import Thread
 from flask_login import current_user
 from flask_socketio import SocketIO, emit
 
+# Import the utility functions from the various modules
 from website.utils.sell_utils.shadowpay import Shadow
 from website.utils.sell_utils.waxpeer import Waxpeer
 from website.utils.sell_utils.csgo_market import CsgoMarket
 
+# Import database models
 from .models import Config, Item
 
+# Initialize a SocketIO object
 socketio = SocketIO()
+
+# Global variables for checking if different services are working
 is_shadowpay_working = False
 is_waxpeer_working = False
 is_csgo_market_working = False
 
 
+# Define a handler for when a client connects
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
 
 
+# Define a handler for when a client disconnects
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected')
 
 
+# Define a handler for the 'shadowpay' event
 @socketio.on("shadowpay")
 def handle_shadowpay(message):
     global is_shadowpay_working
+    # Retrieve the user's configuration
     all_user_configs = Config.query.filter_by(user_id=current_user.id).first()
+    # Initialize a Shadow instance
     shadowpay = Shadow(user_token=all_user_configs.shadow_user_token,
                        merchant_token=all_user_configs.shadow_merchant_token,
                        discount=all_user_configs.shadowpay_discount)
 
+    # This function is run on a separate thread to handle shadowpay operations
     def shadow_run():
         while is_shadowpay_working:
             try:
@@ -59,6 +70,7 @@ def handle_shadowpay(message):
         for item in items:
             all_user_items[item.name] = item.suggested_price
 
+        # Get inventory and start the bot
         asyncio.run(shadowpay.get_inventory(user_items=all_user_items, is_for_sale=True))
 
         shadowpay_thread.start()
@@ -70,6 +82,10 @@ def handle_shadowpay(message):
             socketio.emit("shadowpay", "Bot is successfully stopped!")
         else:
             socketio.emit("shadowpay", "Bot is not working!")
+
+
+# The following functions for waxpeer and csgo_market follow the same structure
+# as the one for shadowpay. They manage the respective bots for the user.
 
 
 @socketio.on("waxpeer")

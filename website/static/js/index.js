@@ -1,11 +1,14 @@
+// The ready event occurs when the DOM (document object model) has been loaded.
+// Once it's loaded, it checks the active page and adds a search logo.
 $(document).ready(function() {
   checkActivePage()
   addSearchLogo()
 })
 
+// This function creates and displays a toast notification with the given header, content and style.
 function showToast(header, content, style) {
-  var toastEl = document.createElement('div');
-  toastEl.classList.add('toast');
+  var toastEl = document.createElement('div');  // Create a new div element for the toast.
+  toastEl.classList.add('toast'); // Add the "toast" class to the div.
   toastEl.setAttribute('role', 'alert');
   toastEl.setAttribute('aria-live', 'assertive');
   toastEl.setAttribute('aria-atomic', 'true');
@@ -16,16 +19,16 @@ function showToast(header, content, style) {
   }
 
   // Create the toast header element
-  var toastHeaderEl = document.createElement('div');
-  toastHeaderEl.classList.add('toast-header');
+  var toastHeaderEl = document.createElement('div'); // Create a new div element for the toast header.
+  toastHeaderEl.classList.add('toast-header');  // Add the "toast-header" class to the div.
   toastHeaderEl.style.backgroundColor = '#fff'
   toastHeaderEl.style.borderBottom = "none"
   toastHeaderEl.innerHTML = '<strong class="me-auto">' + header + '</strong>' +
     '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>';
 
   // Create the toast body element
-  var toastBodyEl = document.createElement('div');
-  toastBodyEl.classList.add('toast-body');
+  var toastBodyEl = document.createElement('div'); // Create a new div element for the toast body.
+  toastBodyEl.classList.add('toast-body'); // Add the "toast-body" class to the div.
   toastBodyEl.textContent = content;
   if(style==="success"){
       toastBodyEl.style.backgroundColor = '#fab007'
@@ -40,12 +43,14 @@ function showToast(header, content, style) {
   toastContainerEl.appendChild(toastEl);
 
   // Show the toast
-  var toast = new bootstrap.Toast(toastEl);
-  toast.show();
+  var toast = new bootstrap.Toast(toastEl); // Create a new bootstrap toast with the div.
+  toast.show(); // Show the toast.
 }
 
 function checkActivePage(){
   switch(window.location.pathname) {
+  // If the active page is Home, highlight the Home link.
+  //... (repeat for each case)
   case "/":
     $("#home")[0].classList.add("active")
     break;
@@ -77,12 +82,16 @@ function checkActivePage(){
     break;}
 }
 
+// This function updates an item's price based on user input.
 function updateItem(itemId) {
   const newSuggestedPrice = document.getElementById(itemId).value;
+  // Specifies the HTTP method to be used (PATCH).
   fetch("/update-item", {
     method: "PATCH",
     body: JSON.stringify({ itemId: itemId, newSuggestedPrice: newSuggestedPrice}),
   }).then((_res) => {
+    // Checks if the fetch request was successful.
+    // If successful, display a success toast, otherwise, display an error toast and reload the page.
     if(_res.ok){
       document.getElementById(itemId).value = newSuggestedPrice
       showToast('Success', 'The operation was successful!', 'success');
@@ -93,6 +102,7 @@ function updateItem(itemId) {
   });
 }
 
+// This function adds a search icon to the search field on the items page.
 function addSearchLogo(){
   if(window.location.pathname === "/items"){
     const newNode = document.createElement("i");
