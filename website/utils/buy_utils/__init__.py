@@ -110,6 +110,7 @@ async def get_all_auction_data(csgo_empire_token, shadow_token, market_token, bu
         all_items_data["status"] = {}
         all_items_data["data"] = "error"
         all_items_data["status"]["details"] = str(error)
+        return all_items_data
 
 
 def update_auction_data(token):
@@ -122,7 +123,7 @@ def update_auction_data(token):
         return str(error), "error"
 
 
-def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_rate):
+async def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_buy_rate):
     all_items_data = {
         "items": {},
         "status": ""
@@ -153,52 +154,54 @@ def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_rate):
         shadowpay_market_data = shadowpay_market_data.result()
         csgo_market_data = csgo_market_data.result()
 
-        for item in buff:
+        for item, values in buff.items():
             if item not in steam_inventories:
-                buff_listing = float(buff[item]["listing"]).__round__(2)
-                if buff_listing != 0:
-                    buff_buy_order = float(buff[item]["buy_order"]).__round__(2)
-                    suggested_price = item_histories[item]["average_14"]
+                buff_listing = float(values["listing"]).__round__(2)
+                if buff_listing != 0 and buff_listing != "0":
+                    buff_buy_order = float(values["buy_order"]).__round__(2)
+                    if item in item_histories:
+                        suggested_price = float(item_histories[item]["average_14"]).__round__(2)
+                        if suggested_price != 0 and suggested_price != "0":
+                            discount = float(100 * (1 - (buff_listing * float(buff_buy_rate) / suggested_price))).__round__(2)
 
-                    discount = float(100 * (1 - (buff_listing * buff_rate / suggested_price))).__round__(2)
+                            if item in shadowpay_market_data:
+                                item_cheapest_shadowpay = shadowpay_market_data[item]["price"]
+                                item_volume_shadowpay = shadowpay_market_data[item]["count"]
+                            else:
+                                item_cheapest_shadowpay = ""
+                                item_volume_shadowpay = 0
 
-                    if item in shadowpay_market_data:
-                        item_cheapest_shadowpay = shadowpay_market_data[item]["price"]
-                        item_volume_shadowpay = shadowpay_market_data[item]["volume"]
-                    else:
-                        item_cheapest_shadowpay = ""
-                        item_volume_shadowpay = 0
+                            if item in csgo_market_data:
+                                item_cheapest_market = csgo_market_data[item]["price"]
+                                item_volume_market = csgo_market_data[item]["count"]
+                            else:
+                                item_cheapest_market = ""
+                                item_volume_market = 0
 
-                    if item in csgo_market_data:
-                        item_cheapest_market = csgo_market_data[item]["price"]
-                        item_volume_market = csgo_market_data[item]["volume"]
-                    else:
-                        item_cheapest_market = ""
-                        item_volume_market = 0
+                            if item in empire_market_data:
+                                if empire_market_data[item]["price"] * 0.61 < buff_listing:
+                                    is_empire_cheaper = True
+                                else:
+                                    is_empire_cheaper = False
 
-                    if item in empire_market_data:
-                        if empire_market_data[item]["price"] * 0.61 < buff_listing:
-                            is_empire_cheaper = True
-                        else:
-                            is_empire_cheaper = False
-                        buff_rate = float(1 - (empire_market_data[item]["price"] * 0.615) /
-                                          (buff_listing * buff_rate)).__round__(2)
-                    else:
-                        is_empire_cheaper = False
-                        buff_rate = ""
+                                buff_rate = float(1 - (empire_market_data[item]["price"] * 0.615) /
+                                                  (buff_listing * buff_buy_rate)).__round__(2)
+                            else:
+                                is_empire_cheaper = False
+                                buff_rate = ""
 
-                    all_items_data["items"][item] = {
-                        "buff_listing": buff_listing,
-                        "buff_buy_order": buff_buy_order,
-                        "suggested_price": suggested_price,
-                        "discount": discount,
-                        "is_cheaper_empire": is_empire_cheaper,
-                        "buff_rate": buff_rate,
-                        "shadowpay_cheapest": item_cheapest_shadowpay,
-                        "shadowpay_count": item_volume_shadowpay,
-                        "market_cheapest": item_cheapest_market,
-                        "market_count": item_volume_market,
-                    }
+                            all_items_data["items"][item] = {
+                                "buff_listing": buff_listing,
+                                "buff_buy_order": buff_buy_order,
+                                "suggested_price": suggested_price,
+                                "discount": discount,
+                                "is_cheaper_empire": is_empire_cheaper,
+                                "buff_rate": buff_rate,
+                                "shadowpay_cheapest": item_cheapest_shadowpay,
+                                "shadowpay_count": item_volume_shadowpay,
+                                "market_cheapest": item_cheapest_market,
+                                "market_count": item_volume_market,
+                            }
 
         all_items_data["status"] = "success"
         return all_items_data
@@ -206,3 +209,4 @@ def buff_buy_data(csgo_empire_token, shadow_token, market_token, buff_rate):
     except Exception as error:
         all_items_data["status"] = "error"
         all_items_data["details"] = str(error)
+        return all_items_data

@@ -9,7 +9,7 @@
 
 <table
   id="table"
-  data-toggle="table" data-filter-control="true" data-show-export="true" data-sort-name="buff_7" data-sort-order="desc"
+  data-toggle="table" data-filter-control="true" data-show-export="true" data-sort-name="discount" data-sort-order="desc"
   class="table-hover table-dark table-borderless">
   <thead>
     <tr>
@@ -18,29 +18,26 @@
       <th data-field="buff_listing" scope="col" data-sortable="true">Buff Listing</th>
       <th data-field="buff_buy_order" scope="col" data-sortable="true">Buff Buy Order</th>
       <th data-field="discount" data-sortable="true" scope="col">Discount</th>
-      <th data-field="rate" data-sortable="true" scope="col">Rate</th>
-      <th data-field="shadowpay_cheapest" data-sortable="true" scope="col">Shadow Cheapest</th>
-      <th data-field="shadowpay_count" data-sortable="true" scope="col">Shadow Count</th>
-      <th data-field="market_cheapest" data-sortable="true" scope="col">Market Cheapest</th>
-      <th data-field="market_count" data-sortable="true" scope="col">Market Count</th>
+      <th data-field="shadowpay_cheapest" scope="col">Shadow Cheapest</th>
+      <th data-field="shadowpay_count" scope="col">Shadow Count</th>
+      <th data-field="market_cheapest"  scope="col">Market Cheapest</th>
+      <th data-field="market_count" scope="col">Market Count</th>
       <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
-    {% for item in buff_data %}
+    {% for item, values in buff_data.items() %}
         <tr class="align-middle">
           <th scope="row">{{ item }}</th>
-          <td class="align-middle"> {{item.suggested_price}} </td>
-          <td class="align-middle">{{ item.buff_listing }}</td>
-          <td class="align-middle">{{ item.buff_buy_order }}</td>
-          <td class="align-middle">{{ item.buff_listing_7 }}</td>
-          <td class="align-middle">{{ item.discount }}</td>
-          <td class="align-middle">{{ item.rate }}</td>
-          <td class="align-middle">{{ item.shadowpay_cheapest }}</td>
-          <td class="align-middle">{{ item.shadowpay_count  }}</td>
-          <td class="align-middle">{{ item.market_cheapest }}</td>
-          <td class="align-middle">{{ item.market_count  }}</td>
-          <td class="align-middle"><button type="button" class="btn btn-primary">Save</button></td>
+          <td class="align-middle"> {{values.suggested_price}} </td>
+          <td class="align-middle">{{ values.buff_listing }}</td>
+          <td class="align-middle">{{ values.buff_buy_order }}</td>
+          <td class="align-middle">{{ values.discount }}</td>
+          <td class="align-middle">{{ values.shadowpay_cheapest }}</td>
+          <td class="align-middle">{{ values.shadowpay_count  }}</td>
+          <td class="align-middle">{{ values.market_cheapest }}</td>
+          <td class="align-middle">{{ values.market_count  }}</td>
+          <td class="align-middle"><button type="button" class="btn btn-primary">Go</button></td>
         </tr>
     {% endfor %}
   </tbody>

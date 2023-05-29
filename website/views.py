@@ -190,7 +190,7 @@ def buff_buy():
             csgo_market_token = current_user.configs[0].csgo_market_token
             buff_rate = current_user.configs[0].buff_rate
             result = asyncio.run(buff_buy_data(csgo_empire_token=csgo_empire_token, shadow_token=shadow_token,
-                                               market_token=csgo_market_token, buff_rate=buff_rate))
+                                               market_token=csgo_market_token, buff_buy_rate=buff_rate))
             if result["status"] == "success":
                 flash('Successfully Loaded All Items!', category='success')
                 return render_template("buff_buy.html", buff_data=result["items"], user=current_user)
