@@ -83,12 +83,13 @@ function checkActivePage(){
 }
 
 // This function updates an item's price based on user input.
-function updateItem(itemId) {
+function updateItem(itemId, type) {
   const newSuggestedPrice = document.getElementById(itemId).value;
+
   // Specifies the HTTP method to be used (PATCH).
   fetch("/update-item", {
     method: "PATCH",
-    body: JSON.stringify({ itemId: itemId, newSuggestedPrice: newSuggestedPrice}),
+    body: JSON.stringify({ itemId: itemId, type:type, newSuggestedPrice: newSuggestedPrice}),
   }).then((_res) => {
     // Checks if the fetch request was successful.
     // If successful, display a success toast, otherwise, display an error toast and reload the page.

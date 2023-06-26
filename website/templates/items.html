@@ -28,12 +28,12 @@
   <tbody>
     {% for item in user_items %}
         {% set image_url = "https://community.cloudflare.steamstatic.com/economy/image/" + item.image %}
-        <tr class="align-middle {% if item.is_special_priced %}special-item{% endif %}">
+        <tr class="align-middle {% if item.is_special_priced %}user-special-item{% endif %}">
           <th scope="row">{{ item.id }}</th>
           <td><img class="item-image" src="{{ image_url }}"/></td>
           <td class="align-middle justify-middle">{{ item.name }}</td>
           <td class="align-middle">{{ item.buff_listing }}</td>
-          <td class="align-middle">{{ item.buff_listing_7 }}</td>
+          <td id="{{ item.id }}_buff7" class="align-middle">{{ item.buff_listing_7 }}</td>
           <td class="align-middle">
               <input value="{{ item.suggested_price }}"
                    id="{{ item.id }}"
@@ -46,7 +46,12 @@
           <td class="align-middle">{{ item.shadow_price }}</td>
           <td class="align-middle">{{ item.waxpeer_price }}</td>
           <td class="align-middle">{{ item.market_price }}</td>
-          <td class="align-middle"><button type="button" class="btn btn-primary" onclick="updateItem({{ item.id }})">Save</button></td>
+          <td class="align-middle">
+              <button type="button" class="btn btn-primary" onclick="updateItem({{ item.id }}, 'update')">Save</button>
+              {% if item.is_special_priced %}
+              <button type="button" class="btn btn-primary" onclick="updateItem({{ item.id }}, 'remove')">Remove</button>
+              {% endif %}
+          </td>
         </tr>
     {% endfor %}
   </tbody>

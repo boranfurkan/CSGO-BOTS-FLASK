@@ -208,9 +208,13 @@ def buff_buy():
             buff_rate = current_user.configs[0].buff_rate
             result = asyncio.run(buff_buy_data(csgo_empire_token=csgo_empire_token, shadow_token=shadow_token,
                                                market_token=csgo_market_token, buff_buy_rate=buff_rate))
+
+            with open("website/utils/buff.json", 'r') as file:
+                buff_item_ids = json.load(file)
+
             if result["status"] == "success":
                 flash('Successfully Loaded All Items!', category='success')
-                return render_template("buff_buy.html", buff_data=result["items"], user=current_user)
+                return render_template("buff_buy.html", buff_data=result["items"], user=current_user, buff_item_ids=buff_item_ids)
             else:
                 flash('Could not fetch buff data. Please try again in 60 seconds.', category='error')
                 return redirect(url_for('views.home'))
@@ -246,13 +250,24 @@ def update_item():
         try:
             item = json.loads(request.data)
             item_id = item["itemId"]
-            new_suggested_price = item["newSuggestedPrice"]
-            item = Item.query.get_or_404(item_id)
-            item.suggested_price = new_suggested_price
-            item.is_special_priced = True
-            db.session.commit()
-            logger.info("success")
-            return jsonify({"status": "success"})
+            operation_type = item["type"]
+            if operation_type == "update":
+                new_suggested_price = item["newSuggestedPrice"]
+                item = Item.query.get_or_404(item_id)
+                item.suggested_price = new_suggested_price
+                item.is_special_priced = True
+                db.session.commit()
+                logger.info("success")
+                return jsonify({"status": "success"})
+            else:
+                item = Item.query.filter_by(id=item_id, user_id=current_user.id).first()
+                suggested_price = float(item.buff_listing_7 *
+                                        current_user.configs[0].suggested_rate).__round__(2)
+                item.suggested_price = suggested_price
+                item.is_special_priced = False
+                db.session.commit()
+                logger.info("success")
+                return jsonify({"status": "success"})
 
         except BaseException as error:
             logger.error(error)

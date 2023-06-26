@@ -37,7 +37,9 @@
           <td class="align-middle">{{ values.shadowpay_count  }}</td>
           <td class="align-middle">{{ values.market_cheapest }}</td>
           <td class="align-middle">{{ values.market_count  }}</td>
-          <td class="align-middle"><button type="button" class="btn btn-primary">Go</button></td>
+          <td class="align-middle"><button type="button" class="btn btn-primary">
+              <a class="go-button" href="https://buff.163.com/goods/{{ buff_item_ids[item] }}" target="_blank">Go</a>
+          </button></td>
         </tr>
     {% endfor %}
   </tbody>
